@@ -1,0 +1,37 @@
+---
+deployment:
+  tasks:
+    # Definir variables de ruta
+    - export DEPLOYPATH=/home/ibbsccou/public_html/IBBP/
+    - export REPOPATH=/home/ibbsccou/repositories/IBBSCMusica/
+
+    # Limpiar public_html (excepto .well-known)
+    - /bin/find $DEPLOYPATH -mindepth 1 ! -name '.well-known' -delete 2>/dev/null || :
+
+    # Copiar contenido de /public a public_html
+    - /bin/cp -R $REPOPATH/public/* $DEPLOYPATH
+    - /bin/cp $REPOPATH/public/.htaccess $DEPLOYPATH 2>/dev/null || :
+
+    # Corregir rutas en index.php para apuntar al repo
+    - /bin/sed -i "s|__DIR__.'/../vendor|'$REPOPATH/vendor|g" $DEPLOYPATH/index.php
+    - /bin/sed -i "s|__DIR__.'/../bootstrap|'$REPOPATH/bootstrap|g" $DEPLOYPATH/index.php
+
+    # Crear symlink para storage
+    - /bin/rm -rf $DEPLOYPATH/storage
+    - /bin/ln -s $REPOPATH/storage/app/public $DEPLOYPATH/storage
+
+    # Instalar dependencias de Composer
+    - /usr/local/bin/ea-php82 /opt/cpanel/composer/bin/composer install --no-dev --optimize-autoloader --working-dir=$REPOPATH 2>/dev/null || echo "Composer no disponible"
+
+    # Migraciones
+    - cd $REPOPATH && /usr/local/bin/ea-php82 artisan migrate --force
+
+    # Optimizar Laravel
+    - cd $REPOPATH && /usr/local/bin/ea-php82 artisan config:cache
+    - cd $REPOPATH && /usr/local/bin/ea-php82 artisan route:cache
+    - cd $REPOPATH && /usr/local/bin/ea-php82 artisan view:cache
+
+    # Permisos correctos
+    - /bin/chmod -R 755 $DEPLOYPATH
+    - /bin/chmod -R 775 $REPOPATH/storage
+    - /bin/chmod -R 775 $REPOPATH/bootstrap/cache

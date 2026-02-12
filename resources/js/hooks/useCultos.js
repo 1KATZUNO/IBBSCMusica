@@ -102,7 +102,7 @@ export function useCultos() {
   };
 
   return {
-    cultos, cultoDetail, loading,
+    cultos, cultoDetail, loading, setCultoDetail,
     fetchCultos, fetchCultoDetail,
     createCulto, deleteCulto,
     addProgramItem, updateProgramItem, removeProgramItem, reorderProgramItems,

@@ -9,6 +9,27 @@ use Illuminate\Http\Request;
 
 class ProgramItemController extends Controller
 {
+    private function formatItem(ProgramItem $item): array
+    {
+        return [
+            'id' => $item->id,
+            'tipo' => $item->type->slug,
+            'tipo_label' => $item->type->label,
+            'emoji' => $item->type->emoji,
+            'bg_color' => $item->type->bg_color,
+            'orden' => $item->orden,
+            'duracion' => $item->duracion,
+            'canto' => $item->canto ? [
+                'id' => $item->canto->id,
+                'nombre' => $item->canto->nombre,
+                'youtube_url' => $item->canto->youtube_url,
+            ] : null,
+            'responsable' => $item->responsable,
+            'titulo' => $item->titulo,
+            'completed_at' => $item->completed_at?->toIso8601String(),
+        ];
+    }
+
     public function store(Request $request, $cultoId)
     {
         $culto = Culto::findOrFail($cultoId);
@@ -18,6 +39,7 @@ class ProgramItemController extends Controller
             'canto_id' => 'nullable|exists:cantos,id',
             'responsable' => 'nullable|string|max:100',
             'titulo' => 'nullable|string|max:200',
+            'duracion' => 'nullable|integer|min:1|max:120',
         ]);
 
         $maxOrder = $culto->programItems()->max('orden') ?? 0;
@@ -27,21 +49,7 @@ class ProgramItemController extends Controller
         $item = ProgramItem::create($data);
         $item->load('type', 'canto');
 
-        return response()->json([
-            'id' => $item->id,
-            'tipo' => $item->type->slug,
-            'tipo_label' => $item->type->label,
-            'emoji' => $item->type->emoji,
-            'bg_color' => $item->type->bg_color,
-            'orden' => $item->orden,
-            'canto' => $item->canto ? [
-                'id' => $item->canto->id,
-                'nombre' => $item->canto->nombre,
-                'youtube_url' => $item->canto->youtube_url,
-            ] : null,
-            'responsable' => $item->responsable,
-            'titulo' => $item->titulo,
-        ], 201);
+        return response()->json($this->formatItem($item), 201);
     }
 
     public function update(Request $request, $cultoId, $itemId)
@@ -53,26 +61,13 @@ class ProgramItemController extends Controller
             'canto_id' => 'nullable|exists:cantos,id',
             'responsable' => 'nullable|string|max:100',
             'titulo' => 'nullable|string|max:200',
+            'duracion' => 'nullable|integer|min:1|max:120',
         ]);
 
         $item->update($data);
         $item->load('type', 'canto');
 
-        return response()->json([
-            'id' => $item->id,
-            'tipo' => $item->type->slug,
-            'tipo_label' => $item->type->label,
-            'emoji' => $item->type->emoji,
-            'bg_color' => $item->type->bg_color,
-            'orden' => $item->orden,
-            'canto' => $item->canto ? [
-                'id' => $item->canto->id,
-                'nombre' => $item->canto->nombre,
-                'youtube_url' => $item->canto->youtube_url,
-            ] : null,
-            'responsable' => $item->responsable,
-            'titulo' => $item->titulo,
-        ]);
+        return response()->json($this->formatItem($item));
     }
 
     public function destroy($cultoId, $itemId)
@@ -98,5 +93,21 @@ class ProgramItemController extends Controller
         }
 
         return response()->json(['message' => 'Orden actualizado']);
+    }
+
+    public function complete($cultoId, $itemId)
+    {
+        $item = ProgramItem::where('culto_id', $cultoId)->findOrFail($itemId);
+        $item->update(['completed_at' => now()]);
+
+        return response()->json(['completed_at' => $item->completed_at->toIso8601String()]);
+    }
+
+    public function uncomplete($cultoId, $itemId)
+    {
+        $item = ProgramItem::where('culto_id', $cultoId)->findOrFail($itemId);
+        $item->update(['completed_at' => null]);
+
+        return response()->json(['completed_at' => null]);
     }
 }

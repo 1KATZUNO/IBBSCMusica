@@ -6,7 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class ProgramItem extends Model
 {
-    protected $fillable = ['culto_id', 'program_item_type_id', 'orden', 'canto_id', 'responsable', 'titulo'];
+    protected $fillable = ['culto_id', 'program_item_type_id', 'orden', 'duracion', 'canto_id', 'responsable', 'titulo', 'completed_at'];
+
+    protected function casts(): array
+    {
+        return ['completed_at' => 'datetime'];
+    }
 
     public function culto()
     {

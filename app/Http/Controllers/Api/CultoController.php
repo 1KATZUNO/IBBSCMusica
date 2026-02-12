@@ -61,6 +61,8 @@ class CultoController extends Controller
             'color' => $culto->color,
             'director_id' => $culto->director_id,
             'director' => $culto->director?->nombre,
+            'started_at' => $culto->started_at?->toIso8601String(),
+            'completed_all_at' => $culto->completed_all_at?->toIso8601String(),
             'musicos' => $musicos,
             'programa' => $culto->programItems->map(fn($item) => [
                 'id' => $item->id,
@@ -69,6 +71,7 @@ class CultoController extends Controller
                 'emoji' => $item->type->emoji,
                 'bg_color' => $item->type->bg_color,
                 'orden' => $item->orden,
+                'duracion' => $item->duracion,
                 'canto' => $item->canto ? [
                     'id' => $item->canto->id,
                     'nombre' => $item->canto->nombre,
@@ -76,6 +79,7 @@ class CultoController extends Controller
                 ] : null,
                 'responsable' => $item->responsable,
                 'titulo' => $item->titulo,
+                'completed_at' => $item->completed_at?->toIso8601String(),
             ]),
         ]);
     }
@@ -140,5 +144,35 @@ class CultoController extends Controller
         Culto::findOrFail($id)->delete();
 
         return response()->json(['message' => 'Culto eliminado']);
+    }
+
+    public function start($id)
+    {
+        $culto = Culto::findOrFail($id);
+        $culto->update([
+            'started_at' => now(),
+            'completed_all_at' => null,
+        ]);
+
+        // Reset completed_at on all program items
+        $culto->programItems()->update(['completed_at' => null]);
+
+        return response()->json([
+            'started_at' => $culto->started_at->toIso8601String(),
+        ]);
+    }
+
+    public function stop($id)
+    {
+        $culto = Culto::findOrFail($id);
+        $culto->update([
+            'started_at' => null,
+            'completed_all_at' => null,
+        ]);
+
+        // Reset completed_at on all program items
+        $culto->programItems()->update(['completed_at' => null]);
+
+        return response()->json(['message' => 'Culto detenido']);
     }
 }

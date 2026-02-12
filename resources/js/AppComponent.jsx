@@ -4,6 +4,7 @@ import { useCultos } from './hooks/useCultos';
 import { useCantos } from './hooks/useCantos';
 import { useMusicians } from './hooks/useMusicians';
 import { useNotification } from './hooks/useNotification';
+import { useLiveMode } from './hooks/useLiveMode';
 import api from './api/client';
 
 import Header from './components/layout/Header';
@@ -27,13 +28,19 @@ export default function App() {
   const { notification, showNotif } = useNotification();
   const {
     cultos, cultoDetail, loading: cultoLoading,
-    fetchCultos, fetchCultoDetail,
+    fetchCultos, fetchCultoDetail, setCultoDetail,
     createCulto, deleteCulto,
     addProgramItem, updateProgramItem, removeProgramItem, reorderProgramItems,
     addMusician, removeMusician,
   } = useCultos();
   const { cantos, fetchCantos } = useCantos();
   const { musicians, fetchMusicians } = useMusicians();
+
+  const {
+    isLive, allCompleted, elapsedSeconds, autoDeleteCountdown,
+    activeItemId, getItemElapsedSeconds,
+    startCulto, stopCulto, completeItem, uncompleteItem, cancelAutoDelete,
+  } = useLiveMode(cultoDetail, setCultoDetail, fetchCultoDetail);
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedCultoId, setSelectedCultoId] = useState(null);
@@ -73,6 +80,21 @@ export default function App() {
       fetchProgramItemTypes();
     }
   }, [selectedCultoId, activeAdmin]);
+
+  // Auto-delete culto when countdown reaches 0
+  useEffect(() => {
+    if (autoDeleteCountdown === 0 && cultoDetail?.id) {
+      (async () => {
+        try {
+          await deleteCulto(cultoDetail.id);
+          setSelectedCultoId(cultos.find(c => c.id !== cultoDetail.id)?.id || null);
+          showNotif('Culto finalizado y eliminado');
+        } catch (e) {
+          showNotif('Error al eliminar culto', 'error');
+        }
+      })();
+    }
+  }, [autoDeleteCountdown]);
 
   const handleSelectCulto = (id) => {
     setSelectedCultoId(id);
@@ -154,18 +176,52 @@ export default function App() {
     try {
       await addMusician(selectedCultoId, musicianId, roleId);
       setShowAssignMusician(false);
-      showNotif('Músico asignado');
+      showNotif('Musico asignado');
     } catch (e) {
-      showNotif('Error al asignar músico', 'error');
+      showNotif('Error al asignar musico', 'error');
     }
   };
 
   const handleRemoveMusician = async (pivotId) => {
     try {
       await removeMusician(selectedCultoId, pivotId);
-      showNotif('Músico removido');
+      showNotif('Musico removido');
     } catch (e) {
-      showNotif('Error al remover músico', 'error');
+      showNotif('Error al remover musico', 'error');
+    }
+  };
+
+  const handleStartCulto = async () => {
+    try {
+      await startCulto(selectedCultoId);
+      showNotif('Culto iniciado en vivo');
+    } catch (e) {
+      showNotif('Error al iniciar culto', 'error');
+    }
+  };
+
+  const handleStopCulto = async () => {
+    try {
+      await stopCulto(selectedCultoId);
+      showNotif('Culto detenido');
+    } catch (e) {
+      showNotif('Error al detener culto', 'error');
+    }
+  };
+
+  const handleCompleteItem = async (itemId) => {
+    try {
+      await completeItem(selectedCultoId, itemId);
+    } catch (e) {
+      showNotif('Error al completar item', 'error');
+    }
+  };
+
+  const handleUncompleteItem = async (itemId) => {
+    try {
+      await uncompleteItem(selectedCultoId, itemId);
+    } catch (e) {
+      showNotif('Error al desmarcar item', 'error');
     }
   };
 
@@ -230,7 +286,7 @@ export default function App() {
       {deletingCulto && (
         <ConfirmDeleteModal
           title="Eliminar Culto"
-          message={`¿Eliminar este culto y todo su programa?`}
+          message={`Eliminar este culto y todo su programa?`}
           onClose={() => setDeletingCulto(false)}
           onConfirm={handleDeleteCulto}
         />
@@ -243,7 +299,16 @@ export default function App() {
           <AdminPanel activePanel={activeAdmin} showNotif={showNotif} />
         ) : cultoDetail ? (
           <>
-            <CultoHeader culto={cultoDetail} />
+            <CultoHeader
+              culto={cultoDetail}
+              isLive={isLive}
+              allCompleted={allCompleted}
+              elapsedSeconds={elapsedSeconds}
+              autoDeleteCountdown={autoDeleteCountdown}
+              onStartCulto={handleStartCulto}
+              onStopCulto={handleStopCulto}
+              onCancelAutoDelete={cancelAutoDelete}
+            />
 
             <CultoMusicians
               musicos={cultoDetail.musicos}
@@ -258,7 +323,7 @@ export default function App() {
               onDirectorChanged={() => fetchCultoDetail(selectedCultoId)}
             />
 
-            {isAdmin && (
+            {isAdmin && !isLive && (
               <div style={{ marginBottom: 16, animation: "fadeSlideIn 0.5s ease 0.18s both" }}>
                 <button onClick={() => setDeletingCulto(true)} style={{
                   padding: "6px 12px", background: "rgba(181,99,87,0.08)",
@@ -275,6 +340,11 @@ export default function App() {
               onRemoveItem={handleRemoveItem}
               onMoveUp={(i) => handleMoveItem(i, -1)}
               onMoveDown={(i) => handleMoveItem(i, 1)}
+              isLive={isLive}
+              activeItemId={activeItemId}
+              getItemElapsedSeconds={getItemElapsedSeconds}
+              onCompleteItem={handleCompleteItem}
+              onUncompleteItem={handleUncompleteItem}
             />
           </>
         ) : cultoLoading ? (

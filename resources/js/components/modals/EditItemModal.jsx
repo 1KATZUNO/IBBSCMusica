@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import CantoSearchInput from '../shared/CantoSearchInput';
 
 const inputStyle = {
   width: "100%", padding: "10px 12px", background: "rgba(255,255,255,0.04)",
@@ -12,6 +13,7 @@ export default function EditItemModal({ item, onClose, onSave, cantos, programIt
   const [cantoId, setCantoId] = useState(String(item.canto?.id || ''));
   const [responsable, setResponsable] = useState(item.responsable || '');
   const [titulo, setTitulo] = useState(item.titulo || '');
+  const [duracion, setDuracion] = useState(item.duracion != null ? String(item.duracion) : '');
   const [saving, setSaving] = useState(false);
 
   const selectedType = programItemTypes.find(t => t.id === Number(typeId));
@@ -21,9 +23,10 @@ export default function EditItemModal({ item, onClose, onSave, cantos, programIt
     try {
       await onSave(item.id, {
         program_item_type_id: Number(typeId),
-        canto_id: selectedType?.requires_canto ? Number(cantoId) : null,
+        canto_id: selectedType?.requires_canto && cantoId ? Number(cantoId) : null,
         responsable: !selectedType?.requires_canto ? responsable || null : null,
         titulo: !selectedType?.requires_canto ? titulo || null : null,
+        duracion: duracion ? Number(duracion) : null,
       });
     } finally {
       setSaving(false);
@@ -49,10 +52,10 @@ export default function EditItemModal({ item, onClose, onSave, cantos, programIt
 
         {selectedType?.requires_canto ? (
           <>
-            <label style={{ color: "#888", fontSize: 11, textTransform: "uppercase", letterSpacing: 1 }}>Seleccionar canto</label>
-            <select value={cantoId} onChange={e => setCantoId(e.target.value)} style={{ ...inputStyle, marginTop: 4 }}>
-              {cantos.map(c => <option key={c.id} value={c.id}>{c.nombre}</option>)}
-            </select>
+            <label style={{ color: "#888", fontSize: 11, textTransform: "uppercase", letterSpacing: 1 }}>Buscar canto</label>
+            <div style={{ marginTop: 4 }}>
+              <CantoSearchInput cantos={cantos} selectedCantoId={cantoId} onSelect={setCantoId} />
+            </div>
           </>
         ) : (
           <>
@@ -61,13 +64,17 @@ export default function EditItemModal({ item, onClose, onSave, cantos, programIt
               placeholder="Ej: Hno. Carlos" style={{ ...inputStyle, marginTop: 4 }} />
             {selectedType?.slug === 'leccion' && (
               <>
-                <label style={{ color: "#888", fontSize: 11, textTransform: "uppercase", letterSpacing: 1 }}>Título</label>
+                <label style={{ color: "#888", fontSize: 11, textTransform: "uppercase", letterSpacing: 1 }}>Titulo</label>
                 <input value={titulo} onChange={e => setTitulo(e.target.value)}
                   placeholder="Ej: La fe que transforma" style={{ ...inputStyle, marginTop: 4 }} />
               </>
             )}
           </>
         )}
+
+        <label style={{ color: "#888", fontSize: 11, textTransform: "uppercase", letterSpacing: 1 }}>Duracion (minutos)</label>
+        <input type="number" min="1" max="120" value={duracion} onChange={e => setDuracion(e.target.value)}
+          placeholder="Ej: 5" style={{ ...inputStyle, marginTop: 4 }} />
 
         <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
           <button onClick={onClose} style={{

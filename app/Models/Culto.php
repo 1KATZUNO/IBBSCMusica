@@ -6,11 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Culto extends Model
 {
-    protected $fillable = ['tipo', 'fecha', 'hora', 'color', 'director_id'];
+    protected $fillable = ['tipo', 'fecha', 'hora', 'color', 'director_id', 'started_at', 'completed_all_at'];
 
     protected function casts(): array
     {
-        return ['fecha' => 'date'];
+        return [
+            'fecha' => 'date',
+            'started_at' => 'datetime',
+            'completed_all_at' => 'datetime',
+        ];
     }
 
     public function director()

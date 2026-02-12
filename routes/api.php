@@ -36,11 +36,17 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/cultos/{id}', [CultoController::class, 'update']);
         Route::delete('/cultos/{id}', [CultoController::class, 'destroy']);
 
+        // Live mode
+        Route::post('/cultos/{id}/start', [CultoController::class, 'start']);
+        Route::post('/cultos/{id}/stop', [CultoController::class, 'stop']);
+
         // Program items
         Route::post('/cultos/{cultoId}/program-items', [ProgramItemController::class, 'store']);
         Route::put('/cultos/{cultoId}/program-items/{itemId}', [ProgramItemController::class, 'update']);
         Route::delete('/cultos/{cultoId}/program-items/{itemId}', [ProgramItemController::class, 'destroy']);
         Route::put('/cultos/{cultoId}/program-items-reorder', [ProgramItemController::class, 'reorder']);
+        Route::post('/cultos/{cultoId}/program-items/{itemId}/complete', [ProgramItemController::class, 'complete']);
+        Route::post('/cultos/{cultoId}/program-items/{itemId}/uncomplete', [ProgramItemController::class, 'uncomplete']);
 
         // Culto musicians
         Route::post('/cultos/{cultoId}/musicians', [CultoMusicianController::class, 'store']);

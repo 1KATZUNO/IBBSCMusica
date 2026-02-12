@@ -1,7 +1,10 @@
 import { useAuth } from '../../hooks/useAuth';
 import ProgramItem from './ProgramItem';
 
-export default function ProgramList({ programa, onAddItem, onEditItem, onRemoveItem, onMoveUp, onMoveDown }) {
+export default function ProgramList({
+  programa, onAddItem, onEditItem, onRemoveItem, onMoveUp, onMoveDown,
+  isLive, activeItemId, getItemElapsedSeconds, onCompleteItem, onUncompleteItem,
+}) {
   const { isAdmin } = useAuth();
 
   return (
@@ -14,8 +17,8 @@ export default function ProgramList({ programa, onAddItem, onEditItem, onRemoveI
         <div style={{
           color: "#888", fontSize: 10, textTransform: "uppercase",
           letterSpacing: 1.5, fontWeight: 600,
-        }}>📋 Orden del Programa</div>
-        {isAdmin && (
+        }}>&#128203; Orden del Programa</div>
+        {isAdmin && !isLive && (
           <button onClick={onAddItem} style={{
             padding: "6px 14px", background: "linear-gradient(135deg, #E8B931, #d4a72a)",
             border: "none", borderRadius: 8, color: "#1a1a1a", fontSize: 12,
@@ -37,6 +40,12 @@ export default function ProgramList({ programa, onAddItem, onEditItem, onRemoveI
             onRemove={() => onRemoveItem(item.id)}
             onMoveUp={() => onMoveUp(i)}
             onMoveDown={() => onMoveDown(i)}
+            isLive={isLive}
+            isActive={item.id === activeItemId}
+            isCompleted={!!item.completed_at}
+            itemElapsedSeconds={getItemElapsedSeconds ? getItemElapsedSeconds(item) : 0}
+            onComplete={() => onCompleteItem && onCompleteItem(item.id)}
+            onUncomplete={() => onUncompleteItem && onUncompleteItem(item.id)}
           />
         ))}
         {(!programa || programa.length === 0) && (
@@ -44,7 +53,7 @@ export default function ProgramList({ programa, onAddItem, onEditItem, onRemoveI
             textAlign: "center", padding: "40px 20px", color: "#555",
             fontSize: 14, fontStyle: "italic",
           }}>
-            Este programa está vacío. {isAdmin ? "Haz clic en '+ Agregar' para comenzar." : ""}
+            Este programa esta vacio. {isAdmin ? "Haz clic en '+ Agregar' para comenzar." : ""}
           </div>
         )}
       </div>

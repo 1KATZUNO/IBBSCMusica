@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import api from '../../api/client';
+import CantoSearchInput from '../shared/CantoSearchInput';
 
 const inputStyle = {
   width: "100%", padding: "10px 12px", background: "rgba(255,255,255,0.04)",
@@ -13,6 +13,7 @@ export default function AddItemModal({ onClose, onAdd, cantos, programItemTypes 
   const [cantoId, setCantoId] = useState('');
   const [responsable, setResponsable] = useState('');
   const [titulo, setTitulo] = useState('');
+  const [duracion, setDuracion] = useState('');
   const [saving, setSaving] = useState(false);
 
   const selectedType = programItemTypes.find(t => t.id === Number(typeId));
@@ -23,20 +24,15 @@ export default function AddItemModal({ onClose, onAdd, cantos, programItemTypes 
     }
   }, [programItemTypes]);
 
-  useEffect(() => {
-    if (selectedType?.requires_canto && cantos.length > 0 && !cantoId) {
-      setCantoId(String(cantos[0].id));
-    }
-  }, [selectedType, cantos]);
-
   const handleAdd = async () => {
     setSaving(true);
     try {
       await onAdd({
         program_item_type_id: Number(typeId),
-        canto_id: selectedType?.requires_canto ? Number(cantoId) : null,
+        canto_id: selectedType?.requires_canto && cantoId ? Number(cantoId) : null,
         responsable: !selectedType?.requires_canto ? responsable || null : null,
         titulo: !selectedType?.requires_canto ? titulo || null : null,
+        duracion: duracion ? Number(duracion) : null,
       });
     } finally {
       setSaving(false);
@@ -62,21 +58,25 @@ export default function AddItemModal({ onClose, onAdd, cantos, programItemTypes 
 
         {selectedType?.requires_canto ? (
           <>
-            <label style={{ color: "#888", fontSize: 11, textTransform: "uppercase", letterSpacing: 1 }}>Seleccionar canto</label>
-            <select value={cantoId} onChange={e => setCantoId(e.target.value)} style={{ ...inputStyle, marginTop: 4 }}>
-              {cantos.map(c => <option key={c.id} value={c.id}>{c.nombre}</option>)}
-            </select>
+            <label style={{ color: "#888", fontSize: 11, textTransform: "uppercase", letterSpacing: 1 }}>Buscar canto</label>
+            <div style={{ marginTop: 4 }}>
+              <CantoSearchInput cantos={cantos} selectedCantoId={cantoId} onSelect={setCantoId} />
+            </div>
           </>
         ) : (
           <>
             <label style={{ color: "#888", fontSize: 11, textTransform: "uppercase", letterSpacing: 1 }}>Responsable</label>
             <input value={responsable} onChange={e => setResponsable(e.target.value)}
               placeholder="Ej: Hno. Carlos" style={{ ...inputStyle, marginTop: 4 }} />
-            <label style={{ color: "#888", fontSize: 11, textTransform: "uppercase", letterSpacing: 1 }}>Título (opcional)</label>
+            <label style={{ color: "#888", fontSize: 11, textTransform: "uppercase", letterSpacing: 1 }}>Titulo (opcional)</label>
             <input value={titulo} onChange={e => setTitulo(e.target.value)}
               placeholder="Ej: La fe que transforma" style={{ ...inputStyle, marginTop: 4 }} />
           </>
         )}
+
+        <label style={{ color: "#888", fontSize: 11, textTransform: "uppercase", letterSpacing: 1 }}>Duracion (minutos)</label>
+        <input type="number" min="1" max="120" value={duracion} onChange={e => setDuracion(e.target.value)}
+          placeholder="Ej: 5" style={{ ...inputStyle, marginTop: 4 }} />
 
         <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
           <button onClick={onClose} style={{

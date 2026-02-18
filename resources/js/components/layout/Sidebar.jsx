@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { formatDate } from '../../utils/formatDate';
 
-export default function Sidebar({ isOpen, onClose, cultos, selectedCulto, onSelectCulto, onCreateCulto, onAdminNav, activeAdmin, showNotif }) {
+export default function Sidebar({ isOpen, onClose, cultos, selectedCulto, onSelectCulto, onCreateCulto, onDeleteCulto, onAdminNav, activeAdmin, showNotif }) {
   const { isLoggedIn, isAdmin, login, logout, user } = useAuth();
   const [email, setEmail] = useState('');
   const [pass, setPass] = useState('');
@@ -68,24 +68,38 @@ export default function Sidebar({ isOpen, onClose, cultos, selectedCulto, onSele
             Próximos Cultos
           </div>
           {cultos.map(c => (
-            <button key={c.id} onClick={() => { onSelectCulto(c.id); onAdminNav(null); onClose(); }}
-              style={{
-                display: "block", width: "100%", textAlign: "left",
-                background: selectedCulto === c.id && !activeAdmin ? "rgba(232,185,49,0.1)" : "transparent",
-                border: selectedCulto === c.id && !activeAdmin ? "1px solid rgba(232,185,49,0.2)" : "1px solid transparent",
-                borderRadius: 10, padding: "12px 14px", marginBottom: 4, cursor: "pointer",
-                transition: "all 0.2s",
-              }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <div style={{
-                  width: 8, height: 8, borderRadius: "50%", background: c.color, flexShrink: 0
-                }} />
-                <div>
-                  <div style={{ color: "#e0e0e0", fontSize: 14, fontWeight: 600 }}>{c.tipo}</div>
-                  <div style={{ color: "#777", fontSize: 12, marginTop: 2 }}>{formatDate(c.fecha)} · {c.hora}</div>
+            <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 4, marginBottom: 4 }}>
+              <button onClick={() => { onSelectCulto(c.id); onAdminNav(null); onClose(); }}
+                style={{
+                  display: "block", flex: 1, textAlign: "left",
+                  background: selectedCulto === c.id && !activeAdmin ? "rgba(232,185,49,0.1)" : "transparent",
+                  border: selectedCulto === c.id && !activeAdmin ? "1px solid rgba(232,185,49,0.2)" : "1px solid transparent",
+                  borderRadius: 10, padding: "12px 14px", cursor: "pointer",
+                  transition: "all 0.2s",
+                }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <div style={{
+                    width: 8, height: 8, borderRadius: "50%", background: c.color, flexShrink: 0
+                  }} />
+                  <div>
+                    <div style={{ color: "#e0e0e0", fontSize: 14, fontWeight: 600 }}>{c.tipo}</div>
+                    <div style={{ color: "#777", fontSize: 12, marginTop: 2 }}>{formatDate(c.fecha)} · {c.hora}</div>
+                  </div>
                 </div>
-              </div>
-            </button>
+              </button>
+              {isAdmin && (
+                <button onClick={(e) => { e.stopPropagation(); onDeleteCulto(c.id); }}
+                  title="Eliminar culto"
+                  style={{
+                    background: "none", border: "none", color: "#666", fontSize: 14,
+                    cursor: "pointer", padding: "8px", borderRadius: 8, flexShrink: 0,
+                    transition: "color 0.2s",
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.color = '#B56357'}
+                  onMouseLeave={e => e.currentTarget.style.color = '#666'}
+                >&#x1F5D1;</button>
+              )}
+            </div>
           ))}
 
           {isAdmin && (

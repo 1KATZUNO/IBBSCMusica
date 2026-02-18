@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import api from '../api/client';
 
-const AUTO_DELETE_SECONDS = 10 * 60; // 10 minutes
+const AUTO_DELETE_SECONDS = 5; // 5 seconds
 
 export function useLiveMode(cultoDetail, setCultoDetail, fetchCultoDetail) {
   const [elapsedSeconds, setElapsedSeconds] = useState(0);

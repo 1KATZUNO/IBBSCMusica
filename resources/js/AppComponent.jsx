@@ -52,7 +52,7 @@ export default function App() {
   const [showAddItemModal, setShowAddItemModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [showAssignMusician, setShowAssignMusician] = useState(false);
-  const [deletingCulto, setDeletingCulto] = useState(false);
+  const [deletingCultoId, setDeletingCultoId] = useState(null);
 
   const fetchProgramItemTypes = () => {
     api.get('/program-item-types').then(({ data }) => setProgramItemTypes(data));
@@ -113,10 +113,13 @@ export default function App() {
   };
 
   const handleDeleteCulto = async () => {
+    const idToDelete = deletingCultoId;
     try {
-      await deleteCulto(selectedCultoId);
-      setSelectedCultoId(cultos.find(c => c.id !== selectedCultoId)?.id || null);
-      setDeletingCulto(false);
+      await deleteCulto(idToDelete);
+      if (selectedCultoId === idToDelete) {
+        setSelectedCultoId(cultos.find(c => c.id !== idToDelete)?.id || null);
+      }
+      setDeletingCultoId(null);
       showNotif('Culto eliminado');
     } catch (e) {
       showNotif('Error al eliminar', 'error');
@@ -243,6 +246,7 @@ export default function App() {
         selectedCulto={selectedCultoId}
         onSelectCulto={handleSelectCulto}
         onCreateCulto={() => setShowCreateModal(true)}
+        onDeleteCulto={(id) => setDeletingCultoId(id)}
         onAdminNav={setActiveAdmin}
         activeAdmin={activeAdmin}
         showNotif={showNotif}
@@ -283,11 +287,11 @@ export default function App() {
         />
       )}
 
-      {deletingCulto && (
+      {deletingCultoId && (
         <ConfirmDeleteModal
           title="Eliminar Culto"
           message={`Eliminar este culto y todo su programa?`}
-          onClose={() => setDeletingCulto(false)}
+          onClose={() => setDeletingCultoId(null)}
           onConfirm={handleDeleteCulto}
         />
       )}
@@ -325,7 +329,7 @@ export default function App() {
 
             {isAdmin && !isLive && (
               <div style={{ marginBottom: 16, animation: "fadeSlideIn 0.5s ease 0.18s both" }}>
-                <button onClick={() => setDeletingCulto(true)} style={{
+                <button onClick={() => setDeletingCultoId(selectedCultoId)} style={{
                   padding: "6px 12px", background: "rgba(181,99,87,0.08)",
                   border: "1px solid rgba(181,99,87,0.2)", borderRadius: 8,
                   color: "#B56357", fontSize: 11, cursor: "pointer", fontFamily: "'DM Sans', sans-serif",

@@ -5,6 +5,7 @@ import { useCantos } from './hooks/useCantos';
 import { useMusicians } from './hooks/useMusicians';
 import { useNotification } from './hooks/useNotification';
 import { useLiveMode } from './hooks/useLiveMode';
+import { formatTime } from './utils/formatTime';
 import api from './api/client';
 
 import Header from './components/layout/Header';
@@ -22,6 +23,11 @@ import AddItemModal from './components/modals/AddItemModal';
 import EditItemModal from './components/modals/EditItemModal';
 import AssignMusicianModal from './components/modals/AssignMusicianModal';
 import ConfirmDeleteModal from './components/modals/ConfirmDeleteModal';
+
+function extractRgb(bg) {
+  const m = bg?.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+  return m ? [+m[1], +m[2], +m[3]] : [100, 100, 100];
+}
 
 export default function App() {
   const { isLoggedIn, isAdmin } = useAuth();
@@ -58,20 +64,17 @@ export default function App() {
     api.get('/program-item-types').then(({ data }) => setProgramItemTypes(data));
   };
 
-  // Initial data load
   useEffect(() => {
     fetchCultos();
     fetchProgramItemTypes();
   }, []);
 
-  // Select first culto when list loads
   useEffect(() => {
     if (cultos.length > 0 && !selectedCultoId) {
       setSelectedCultoId(cultos[0].id);
     }
   }, [cultos]);
 
-  // Fetch culto detail when selected
   useEffect(() => {
     if (selectedCultoId && !activeAdmin) {
       fetchCultoDetail(selectedCultoId);
@@ -81,7 +84,6 @@ export default function App() {
     }
   }, [selectedCultoId, activeAdmin]);
 
-  // Auto-delete culto when countdown reaches 0
   useEffect(() => {
     if (autoDeleteCountdown === 0 && cultoDetail?.id) {
       (async () => {
@@ -228,12 +230,21 @@ export default function App() {
     }
   };
 
+  // Get active program item for Now Playing bar
+  const activeProgItem = isLive && cultoDetail?.programa
+    ? cultoDetail.programa.find(p => p.id === activeItemId)
+    : null;
+
+  const activeItemElapsed = activeProgItem && getItemElapsedSeconds
+    ? getItemElapsedSeconds(activeProgItem)
+    : 0;
+
   return (
     <div style={{
       minHeight: "100vh",
-      background: "#111",
-      fontFamily: "'DM Sans', sans-serif",
-      color: "#e0e0e0",
+      background: "#0A0A0B",
+      fontFamily: "'Outfit', sans-serif",
+      color: "#E8E8E8",
       position: "relative",
       overflow: "hidden",
     }}>
@@ -250,6 +261,7 @@ export default function App() {
         onAdminNav={setActiveAdmin}
         activeAdmin={activeAdmin}
         showNotif={showNotif}
+        cultoDetail={cultoDetail}
       />
 
       {showCreateModal && (
@@ -298,76 +310,172 @@ export default function App() {
 
       <Header onOpenSidebar={() => setSidebarOpen(true)} />
 
-      <main style={{ maxWidth: 640, margin: "0 auto", padding: "24px 16px 80px" }}>
-        {activeAdmin ? (
-          <AdminPanel activePanel={activeAdmin} showNotif={showNotif} />
-        ) : cultoDetail ? (
-          <>
-            <CultoHeader
-              culto={cultoDetail}
-              isLive={isLive}
-              allCompleted={allCompleted}
-              elapsedSeconds={elapsedSeconds}
-              autoDeleteCountdown={autoDeleteCountdown}
-              onStartCulto={handleStartCulto}
-              onStopCulto={handleStopCulto}
-              onCancelAutoDelete={cancelAutoDelete}
-            />
+      <main style={{ maxWidth: 680, margin: "0 auto", position: "relative" }}>
+        <div style={{ padding: "0 0 120px" }}>
+          {activeAdmin ? (
+            <div style={{ padding: "24px 24px 0" }}>
+              <AdminPanel activePanel={activeAdmin} showNotif={showNotif} />
+            </div>
+          ) : cultoDetail ? (
+            <>
+              <CultoHeader
+                culto={cultoDetail}
+                isLive={isLive}
+                allCompleted={allCompleted}
+                elapsedSeconds={elapsedSeconds}
+                autoDeleteCountdown={autoDeleteCountdown}
+                onStartCulto={handleStartCulto}
+                onStopCulto={handleStopCulto}
+                onCancelAutoDelete={cancelAutoDelete}
+              />
 
-            <CultoMusicians
-              musicos={cultoDetail.musicos}
-              onAddMusician={() => setShowAssignMusician(true)}
-              onRemoveMusician={handleRemoveMusician}
-            />
+              <CultoMusicians
+                musicos={cultoDetail.musicos}
+                onAddMusician={() => setShowAssignMusician(true)}
+                onRemoveMusician={handleRemoveMusician}
+              />
 
-            <CultoDirector
-              directorName={cultoDetail.director}
-              directorId={cultoDetail.director_id}
-              cultoId={cultoDetail.id}
-              onDirectorChanged={() => fetchCultoDetail(selectedCultoId)}
-            />
+              <CultoDirector
+                directorName={cultoDetail.director}
+                directorId={cultoDetail.director_id}
+                cultoId={cultoDetail.id}
+                onDirectorChanged={() => fetchCultoDetail(selectedCultoId)}
+              />
 
-            {isAdmin && !isLive && (
-              <div style={{ marginBottom: 16, animation: "fadeSlideIn 0.5s ease 0.18s both" }}>
-                <button onClick={() => setDeletingCultoId(selectedCultoId)} style={{
-                  padding: "6px 12px", background: "rgba(181,99,87,0.08)",
-                  border: "1px solid rgba(181,99,87,0.2)", borderRadius: 8,
-                  color: "#B56357", fontSize: 11, cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
-                }}>Eliminar este culto</button>
-              </div>
-            )}
+              {isAdmin && !isLive && (
+                <div style={{ padding: "0 24px", marginBottom: 16, animation: "fadeUp 0.5s ease 0.18s both" }}>
+                  <button onClick={() => setDeletingCultoId(selectedCultoId)} className="action-btn" style={{
+                    padding: "6px 14px", background: "rgba(239,68,68,0.08)",
+                    border: "1px solid rgba(239,68,68,0.2)", borderRadius: 8,
+                    color: "#EF4444", fontSize: 11, cursor: "pointer", fontFamily: "'Outfit', sans-serif",
+                  }}>Eliminar este culto</button>
+                </div>
+              )}
 
-            <ProgramList
-              programa={cultoDetail.programa}
-              onAddItem={() => setShowAddItemModal(true)}
-              onEditItem={setEditingItem}
-              onRemoveItem={handleRemoveItem}
-              onMoveUp={(i) => handleMoveItem(i, -1)}
-              onMoveDown={(i) => handleMoveItem(i, 1)}
-              isLive={isLive}
-              activeItemId={activeItemId}
-              getItemElapsedSeconds={getItemElapsedSeconds}
-              onCompleteItem={handleCompleteItem}
-              onUncompleteItem={handleUncompleteItem}
-            />
-          </>
-        ) : cultoLoading ? (
-          <div style={{ textAlign: "center", padding: "60px 20px", color: "#555" }}>
-            <div style={{
-              width: 30, height: 30, border: "3px solid rgba(232,185,49,0.2)",
-              borderTopColor: "#E8B931", borderRadius: "50%",
-              animation: "spin 0.8s linear infinite", margin: "0 auto 12px",
-            }} />
-            Cargando...
-          </div>
-        ) : (
-          <div style={{ textAlign: "center", padding: "60px 20px", color: "#555" }}>
-            Selecciona un culto del panel lateral
-          </div>
-        )}
+              <ProgramList
+                programa={cultoDetail.programa}
+                onAddItem={() => setShowAddItemModal(true)}
+                onEditItem={setEditingItem}
+                onRemoveItem={handleRemoveItem}
+                onMoveUp={(i) => handleMoveItem(i, -1)}
+                onMoveDown={(i) => handleMoveItem(i, 1)}
+                isLive={isLive}
+                activeItemId={activeItemId}
+                getItemElapsedSeconds={getItemElapsedSeconds}
+                onCompleteItem={handleCompleteItem}
+                onUncompleteItem={handleUncompleteItem}
+                cultoColor={cultoDetail.color}
+              />
+            </>
+          ) : cultoLoading ? (
+            <div style={{ textAlign: "center", padding: "60px 20px", color: "#555" }}>
+              <div style={{
+                width: 30, height: 30, border: "3px solid rgba(108,92,231,0.2)",
+                borderTopColor: "#6C5CE7", borderRadius: "50%",
+                animation: "spin 0.8s linear infinite", margin: "0 auto 12px",
+              }} />
+              Cargando...
+            </div>
+          ) : (
+            <div style={{ textAlign: "center", padding: "60px 20px", color: "#555" }}>
+              Selecciona un culto del panel lateral
+            </div>
+          )}
+        </div>
       </main>
 
+      {/* Now Playing Bar */}
+      {isLive && activeProgItem && (
+        <NowPlayingBar
+          item={activeProgItem}
+          culto={cultoDetail}
+          elapsed={activeItemElapsed}
+          onComplete={() => handleCompleteItem(activeProgItem.id)}
+        />
+      )}
+
       {!isLoggedIn && <FooterHint />}
+    </div>
+  );
+}
+
+function NowPlayingBar({ item, culto, elapsed, onComplete }) {
+  const [ir, ig, ib] = extractRgb(item.bg_color);
+  const itemColor = `rgb(${ir},${ig},${ib})`;
+  const progress = item.duracion ? Math.min((elapsed / (item.duracion * 60)) * 100, 100) : 0;
+
+  return (
+    <div style={{
+      position: "fixed", bottom: 0, left: 0, right: 0,
+      background: "rgba(18,18,20,0.95)",
+      backdropFilter: "blur(24px)",
+      borderTop: "1px solid rgba(255,255,255,0.06)",
+      zIndex: 150,
+      animation: "fadeUp 0.4s ease",
+    }}>
+      {/* Progress bar */}
+      {item.duracion && (
+        <div style={{ height: 2, background: "rgba(255,255,255,0.04)" }}>
+          <div style={{
+            height: "100%",
+            width: `${progress}%`,
+            background: itemColor,
+            transition: "width 1s linear",
+            boxShadow: `0 0 8px rgba(${ir},${ig},${ib},0.5)`,
+          }} />
+        </div>
+      )}
+
+      <div style={{
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        padding: "12px 24px",
+        maxWidth: 680, margin: "0 auto",
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 14, minWidth: 0 }}>
+          {/* Equalizer icon */}
+          <div style={{
+            width: 36, height: 36, borderRadius: 8,
+            background: `rgba(${ir},${ig},${ib},0.15)`,
+            display: "flex", alignItems: "flex-end", justifyContent: "center", gap: 2,
+            padding: "0 0 8px",
+            flexShrink: 0,
+          }}>
+            {[0, 0.2, 0.4].map((d, i) => (
+              <div key={i} className="eq-bar" style={{
+                width: 3, borderRadius: 1,
+                background: itemColor,
+                animationDelay: `${d}s`,
+              }} />
+            ))}
+          </div>
+          <div style={{ minWidth: 0 }}>
+            <div style={{
+              fontSize: 13, fontWeight: 600, color: "#fff",
+              whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+            }}>
+              {item.canto?.nombre || item.titulo}
+            </div>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>
+              {item.tipo_label} {culto ? `· ${culto.tipo}` : ''}
+            </div>
+          </div>
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center", gap: 14, flexShrink: 0 }}>
+          <span style={{
+            fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,0.5)",
+            fontVariantNumeric: "tabular-nums",
+          }}>{formatTime(elapsed)}</span>
+          <button onClick={onComplete} className="action-btn" style={{
+            width: 32, height: 32, borderRadius: "50%",
+            background: `rgba(${ir},${ig},${ib},0.2)`,
+            border: `2px solid rgba(${ir},${ig},${ib},0.5)`,
+            color: itemColor,
+            fontSize: 14, cursor: "pointer",
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>&#10003;</button>
+        </div>
+      </div>
     </div>
   );
 }

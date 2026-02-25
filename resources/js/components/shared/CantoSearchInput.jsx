@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 
 const inputStyle = {
-  width: "100%", padding: "10px 12px", background: "rgba(255,255,255,0.04)",
-  border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8,
-  color: "#e0e0e0", fontSize: 14, outline: "none", fontFamily: "'DM Sans', sans-serif",
+  width: "100%", padding: "10px 12px", background: "rgba(255,255,255,0.06)",
+  border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8,
+  color: "#E8E8E8", fontSize: 14, outline: "none", fontFamily: "'Outfit', sans-serif",
   boxSizing: "border-box",
 };
 
@@ -63,7 +63,7 @@ export default function CantoSearchInput({ cantos, selectedCantoId, onSelect }) 
         {selectedCantoId && (
           <button onClick={handleClear} style={{
             position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)",
-            background: "none", border: "none", color: "#888", fontSize: 16,
+            background: "none", border: "none", color: "rgba(255,255,255,0.4)", fontSize: 16,
             cursor: "pointer", padding: "2px 4px", lineHeight: 1,
           }}>&times;</button>
         )}
@@ -71,7 +71,7 @@ export default function CantoSearchInput({ cantos, selectedCantoId, onSelect }) 
       {open && filtered.length > 0 && (
         <div style={{
           position: "absolute", top: "100%", left: 0, right: 0, zIndex: 50,
-          background: "#2a2a2a", border: "1px solid rgba(255,255,255,0.1)",
+          background: "#1a1a1c", border: "1px solid rgba(255,255,255,0.08)",
           borderRadius: 8, marginTop: 4, maxHeight: 200, overflowY: "auto",
         }}>
           {filtered.map(c => (
@@ -79,12 +79,12 @@ export default function CantoSearchInput({ cantos, selectedCantoId, onSelect }) 
               key={c.id}
               onClick={() => handleSelect(c)}
               style={{
-                padding: "8px 12px", cursor: "pointer", fontSize: 14, color: "#e0e0e0",
-                background: c.id === Number(selectedCantoId) ? "rgba(232,185,49,0.1)" : "transparent",
+                padding: "8px 12px", cursor: "pointer", fontSize: 14, color: "#E8E8E8",
+                background: c.id === Number(selectedCantoId) ? "rgba(255,255,255,0.06)" : "transparent",
                 borderBottom: "1px solid rgba(255,255,255,0.04)",
               }}
               onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.06)"}
-              onMouseLeave={e => e.currentTarget.style.background = c.id === Number(selectedCantoId) ? "rgba(232,185,49,0.1)" : "transparent"}
+              onMouseLeave={e => e.currentTarget.style.background = c.id === Number(selectedCantoId) ? "rgba(255,255,255,0.06)" : "transparent"}
             >
               {c.nombre}
             </div>
@@ -94,9 +94,9 @@ export default function CantoSearchInput({ cantos, selectedCantoId, onSelect }) 
       {open && query && filtered.length === 0 && (
         <div style={{
           position: "absolute", top: "100%", left: 0, right: 0, zIndex: 50,
-          background: "#2a2a2a", border: "1px solid rgba(255,255,255,0.1)",
+          background: "#1a1a1c", border: "1px solid rgba(255,255,255,0.08)",
           borderRadius: 8, marginTop: 4, padding: "10px 12px",
-          color: "#666", fontSize: 13, fontStyle: "italic",
+          color: "rgba(255,255,255,0.3)", fontSize: 13, fontStyle: "italic",
         }}>
           No se encontraron cantos
         </div>

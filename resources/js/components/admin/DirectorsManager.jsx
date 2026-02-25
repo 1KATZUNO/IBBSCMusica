@@ -3,9 +3,9 @@ import api from '../../api/client';
 import ConfirmDeleteModal from '../modals/ConfirmDeleteModal';
 
 const inputStyle = {
-  width: "100%", padding: "10px 12px", background: "rgba(255,255,255,0.04)",
-  border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8,
-  color: "#e0e0e0", fontSize: 14, outline: "none", fontFamily: "'DM Sans', sans-serif",
+  width: "100%", padding: "10px 12px", background: "rgba(255,255,255,0.06)",
+  border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8,
+  color: "#E8E8E8", fontSize: 14, outline: "none", fontFamily: "'Outfit', sans-serif",
   boxSizing: "border-box", marginBottom: 12,
 };
 
@@ -90,23 +90,23 @@ export default function DirectorsManager({ showNotif }) {
 
   return (
     <div style={{ animation: "fadeSlideIn 0.5s ease" }}>
-      <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 24, color: "#f0f0f0", marginBottom: 6 }}>
+      <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 24, color: "#f0f0f0", marginBottom: 6 }}>
         👤 Directores
       </h2>
-      <p style={{ color: "#666", fontSize: 13, marginBottom: 20 }}>Directores de música disponibles</p>
+      <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 13, marginBottom: 20 }}>Directores de música disponibles</p>
 
       <button onClick={startNew} style={{
-        padding: "10px 16px", background: "linear-gradient(135deg, #E8B931, #d4a72a)",
-        border: "none", borderRadius: 8, color: "#1a1a1a", fontSize: 13,
-        fontWeight: 700, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", marginBottom: 16,
+        padding: "10px 16px", background: "rgba(255,255,255,0.12)",
+        border: "none", borderRadius: 8, color: "#fff", fontSize: 13,
+        fontWeight: 700, cursor: "pointer", fontFamily: "'Outfit', sans-serif", marginBottom: 16,
       }}>+ Nuevo Director</button>
 
       {editingId && (
         <div style={{
-          background: "rgba(232,185,49,0.05)", border: "1px solid rgba(232,185,49,0.15)",
+          background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)",
           borderRadius: 12, padding: 16, marginBottom: 16,
         }}>
-          <label style={{ color: "#888", fontSize: 11, textTransform: "uppercase", letterSpacing: 1 }}>Nombre</label>
+          <label style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, textTransform: "uppercase", letterSpacing: 1 }}>Nombre</label>
           <input value={form.nombre} onChange={e => setForm({ nombre: e.target.value })}
             placeholder="Nombre del director" style={{ ...inputStyle, marginTop: 4 }} />
 
@@ -114,12 +114,12 @@ export default function DirectorsManager({ showNotif }) {
             <button onClick={cancelEdit} style={{
               padding: "8px 16px", background: "rgba(255,255,255,0.04)",
               border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8,
-              color: "#888", fontSize: 12, cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
+              color: "rgba(255,255,255,0.5)", fontSize: 12, cursor: "pointer", fontFamily: "'Outfit', sans-serif",
             }}>Cancelar</button>
             <button onClick={handleSave} disabled={saving} style={{
-              padding: "8px 16px", background: "linear-gradient(135deg, #E8B931, #d4a72a)",
-              border: "none", borderRadius: 8, color: "#1a1a1a", fontSize: 12,
-              fontWeight: 700, cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
+              padding: "8px 16px", background: "rgba(255,255,255,0.12)",
+              border: "none", borderRadius: 8, color: "#fff", fontSize: 12,
+              fontWeight: 700, cursor: "pointer", fontFamily: "'Outfit', sans-serif",
               opacity: saving ? 0.7 : 1,
             }}>{saving ? 'Guardando...' : 'Guardar'}</button>
           </div>
@@ -134,19 +134,19 @@ export default function DirectorsManager({ showNotif }) {
             <div key={d.id} style={{
               display: "flex", alignItems: "center", justifyContent: "space-between",
               padding: "12px 14px", marginBottom: 4, borderRadius: 10,
-              background: editingId === d.id ? "rgba(232,185,49,0.08)" : "rgba(255,255,255,0.02)",
+              background: editingId === d.id ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.02)",
               border: "1px solid rgba(255,255,255,0.05)",
             }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <div style={{
                   width: 28, height: 28, borderRadius: "50%",
-                  background: d.activo ? "linear-gradient(135deg, #E8B931, #B56357)" : "rgba(255,255,255,0.1)",
+                  background: d.activo ? "linear-gradient(135deg, rgba(255,255,255,0.25), rgba(255,255,255,0.1))" : "rgba(255,255,255,0.1)",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   color: d.activo ? "#fff" : "#555", fontSize: 11, fontWeight: 700,
                 }}>{d.nombre[0]}</div>
                 <div>
-                  <div style={{ color: d.activo ? "#e0e0e0" : "#666", fontSize: 14, fontWeight: 500 }}>{d.nombre}</div>
-                  <div style={{ fontSize: 10, color: d.activo ? "#6B8F71" : "#666", marginTop: 2 }}>
+                  <div style={{ color: d.activo ? "#E8E8E8" : "rgba(255,255,255,0.35)", fontSize: 14, fontWeight: 500 }}>{d.nombre}</div>
+                  <div style={{ fontSize: 10, color: d.activo ? "#6B8F71" : "rgba(255,255,255,0.35)", marginTop: 2 }}>
                     {d.activo ? 'Activo' : 'Inactivo'}
                   </div>
                 </div>
@@ -155,16 +155,16 @@ export default function DirectorsManager({ showNotif }) {
                 <button onClick={() => handleToggleActive(d)} style={{
                   padding: "4px 10px", background: d.activo ? "rgba(107,143,113,0.1)" : "rgba(255,255,255,0.04)",
                   border: d.activo ? "1px solid rgba(107,143,113,0.2)" : "1px solid rgba(255,255,255,0.08)",
-                  borderRadius: 6, color: d.activo ? "#6B8F71" : "#888", fontSize: 11,
-                  cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
+                  borderRadius: 6, color: d.activo ? "#6B8F71" : "rgba(255,255,255,0.35)", fontSize: 11,
+                  cursor: "pointer", fontFamily: "'Outfit', sans-serif",
                 }}>{d.activo ? 'Desactivar' : 'Activar'}</button>
                 <button onClick={() => startEdit(d)} style={{
-                  padding: "4px 10px", background: "rgba(232,185,49,0.1)", border: "1px solid rgba(232,185,49,0.2)",
-                  borderRadius: 6, color: "#E8B931", fontSize: 11, cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
+                  padding: "4px 10px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)",
+                  borderRadius: 6, color: "#fff", fontSize: 11, cursor: "pointer", fontFamily: "'Outfit', sans-serif",
                 }}>Editar</button>
                 <button onClick={() => setDeleteTarget(d)} style={{
-                  padding: "4px 10px", background: "rgba(181,99,87,0.1)", border: "1px solid rgba(181,99,87,0.2)",
-                  borderRadius: 6, color: "#B56357", fontSize: 11, cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
+                  padding: "4px 10px", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)",
+                  borderRadius: 6, color: "#EF4444", fontSize: 11, cursor: "pointer", fontFamily: "'Outfit', sans-serif",
                 }}>Eliminar</button>
               </div>
             </div>

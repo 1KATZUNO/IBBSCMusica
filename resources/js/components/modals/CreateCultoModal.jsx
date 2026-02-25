@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import api from '../../api/client';
 
 const inputStyle = {
-  width: "100%", padding: "10px 12px", background: "rgba(255,255,255,0.04)",
-  border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8,
-  color: "#e0e0e0", fontSize: 14, outline: "none", fontFamily: "'DM Sans', sans-serif",
+  width: "100%", padding: "10px 12px", background: "rgba(255,255,255,0.06)",
+  border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8,
+  color: "#E8E8E8", fontSize: 14, outline: "none", fontFamily: "'Outfit', sans-serif",
   boxSizing: "border-box", marginBottom: 12,
 };
 
@@ -38,22 +38,22 @@ export default function CreateCultoModal({ onClose, onCreate }) {
       display: "flex", alignItems: "center", justifyContent: "center", backdropFilter: "blur(8px)" }}
       onClick={onClose}>
       <div onClick={e => e.stopPropagation()} style={{
-        background: "#222", borderRadius: 16, padding: "28px",
+        background: "#111113", borderRadius: 16, padding: "28px",
         width: 380, maxWidth: "90vw", border: "1px solid rgba(255,255,255,0.08)",
       }}>
-        <h3 style={{ color: "#E8B931", fontFamily: "'Playfair Display', serif", fontSize: 20, margin: "0 0 20px" }}>
+        <h3 style={{ color: "#fff", fontFamily: "'Fraunces', serif", fontSize: 20, margin: "0 0 20px" }}>
           Crear Nuevo Culto
         </h3>
-        <label style={{ color: "#888", fontSize: 11, textTransform: "uppercase", letterSpacing: 1 }}>Tipo de culto</label>
+        <label style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, textTransform: "uppercase", letterSpacing: 1.5 }}>Tipo de culto</label>
         <select value={tipo} onChange={e => setTipo(e.target.value)} style={{ ...inputStyle, marginTop: 4 }}>
-          {["Domingo AM", "Domingo PM", "Miércoles", "Viernes", "Sábado", "Especial"].map(t =>
+          {["Domingo AM", "Domingo PM", "Miercoles", "Viernes", "Sabado", "Especial"].map(t =>
             <option key={t} value={t}>{t}</option>)}
         </select>
-        <label style={{ color: "#888", fontSize: 11, textTransform: "uppercase", letterSpacing: 1 }}>Fecha</label>
+        <label style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, textTransform: "uppercase", letterSpacing: 1.5 }}>Fecha</label>
         <input type="date" value={fecha} onChange={e => setFecha(e.target.value)} style={{ ...inputStyle, marginTop: 4 }} />
-        <label style={{ color: "#888", fontSize: 11, textTransform: "uppercase", letterSpacing: 1 }}>Hora</label>
+        <label style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, textTransform: "uppercase", letterSpacing: 1.5 }}>Hora</label>
         <input value={hora} onChange={e => setHora(e.target.value)} style={{ ...inputStyle, marginTop: 4 }} />
-        <label style={{ color: "#888", fontSize: 11, textTransform: "uppercase", letterSpacing: 1 }}>Director</label>
+        <label style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, textTransform: "uppercase", letterSpacing: 1.5 }}>Director</label>
         <select value={directorId} onChange={e => setDirectorId(e.target.value)} style={{ ...inputStyle, marginTop: 4 }}>
           <option value="">Sin director</option>
           {directors.map(d =>
@@ -63,12 +63,12 @@ export default function CreateCultoModal({ onClose, onCreate }) {
           <button onClick={onClose} style={{
             flex: 1, padding: "10px", background: "rgba(255,255,255,0.04)",
             border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8,
-            color: "#888", fontSize: 13, cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
+            color: "rgba(255,255,255,0.5)", fontSize: 13, cursor: "pointer", fontFamily: "'Outfit', sans-serif",
           }}>Cancelar</button>
           <button onClick={handleCreate} disabled={saving} style={{
-            flex: 1, padding: "10px", background: "linear-gradient(135deg, #E8B931, #d4a72a)",
-            border: "none", borderRadius: 8, color: "#1a1a1a", fontSize: 13,
-            fontWeight: 700, cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
+            flex: 1, padding: "10px", background: "rgba(255,255,255,0.12)",
+            border: "none", borderRadius: 8, color: "#fff", fontSize: 13,
+            fontWeight: 700, cursor: "pointer", fontFamily: "'Outfit', sans-serif",
             opacity: saving ? 0.7 : 1,
           }}>{saving ? 'Creando...' : 'Crear'}</button>
         </div>

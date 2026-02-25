@@ -3,9 +3,9 @@ import { useMusicians } from '../../hooks/useMusicians';
 import ConfirmDeleteModal from '../modals/ConfirmDeleteModal';
 
 const inputStyle = {
-  width: "100%", padding: "10px 12px", background: "rgba(255,255,255,0.04)",
-  border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8,
-  color: "#e0e0e0", fontSize: 14, outline: "none", fontFamily: "'DM Sans', sans-serif",
+  width: "100%", padding: "10px 12px", background: "rgba(255,255,255,0.06)",
+  border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8,
+  color: "#E8E8E8", fontSize: 14, outline: "none", fontFamily: "'Outfit', sans-serif",
   boxSizing: "border-box", marginBottom: 12,
 };
 
@@ -79,38 +79,38 @@ export default function MusiciansManager({ showNotif }) {
 
   return (
     <div style={{ animation: "fadeSlideIn 0.5s ease" }}>
-      <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 24, color: "#f0f0f0", marginBottom: 6 }}>
+      <h2 style={{ fontFamily: "'Fraunces', serif", fontSize: 24, color: "#f0f0f0", marginBottom: 6 }}>
         🎸 Músicos
       </h2>
-      <p style={{ color: "#666", fontSize: 13, marginBottom: 20 }}>Músicos registrados del ministerio</p>
+      <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 13, marginBottom: 20 }}>Músicos registrados del ministerio</p>
 
       <button onClick={startNew} style={{
-        padding: "10px 16px", background: "linear-gradient(135deg, #E8B931, #d4a72a)",
-        border: "none", borderRadius: 8, color: "#1a1a1a", fontSize: 13,
-        fontWeight: 700, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", marginBottom: 16,
+        padding: "10px 16px", background: "rgba(255,255,255,0.12)",
+        border: "none", borderRadius: 8, color: "#fff", fontSize: 13,
+        fontWeight: 700, cursor: "pointer", fontFamily: "'Outfit', sans-serif", marginBottom: 16,
       }}>+ Nuevo Músico</button>
 
       {/* Form */}
       {editingId && (
         <div style={{
-          background: "rgba(232,185,49,0.05)", border: "1px solid rgba(232,185,49,0.15)",
+          background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)",
           borderRadius: 12, padding: 16, marginBottom: 16,
         }}>
-          <label style={{ color: "#888", fontSize: 11, textTransform: "uppercase", letterSpacing: 1 }}>Nombre</label>
+          <label style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, textTransform: "uppercase", letterSpacing: 1 }}>Nombre</label>
           <input value={form.nombre} onChange={e => setForm(f => ({ ...f, nombre: e.target.value }))}
             placeholder="Nombre del músico" style={{ ...inputStyle, marginTop: 4 }} />
 
-          <label style={{ color: "#888", fontSize: 11, textTransform: "uppercase", letterSpacing: 1, display: "block", marginBottom: 8 }}>
+          <label style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, textTransform: "uppercase", letterSpacing: 1, display: "block", marginBottom: 8 }}>
             Roles (máx. 3)
           </label>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 12 }}>
             {musicianRoles.map(role => (
               <button key={role.id} onClick={() => toggleRole(role.id)} style={{
                 padding: "6px 14px", borderRadius: 20, fontSize: 12, cursor: "pointer",
-                fontFamily: "'DM Sans', sans-serif",
-                background: form.role_ids.includes(role.id) ? "rgba(232,185,49,0.2)" : "rgba(255,255,255,0.04)",
-                border: form.role_ids.includes(role.id) ? "1px solid rgba(232,185,49,0.4)" : "1px solid rgba(255,255,255,0.08)",
-                color: form.role_ids.includes(role.id) ? "#E8B931" : "#999",
+                fontFamily: "'Outfit', sans-serif",
+                background: form.role_ids.includes(role.id) ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.04)",
+                border: form.role_ids.includes(role.id) ? "1px solid rgba(255,255,255,0.25)" : "1px solid rgba(255,255,255,0.08)",
+                color: form.role_ids.includes(role.id) ? "#fff" : "#999",
               }}>{role.nombre}</button>
             ))}
           </div>
@@ -119,12 +119,12 @@ export default function MusiciansManager({ showNotif }) {
             <button onClick={cancelEdit} style={{
               padding: "8px 16px", background: "rgba(255,255,255,0.04)",
               border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8,
-              color: "#888", fontSize: 12, cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
+              color: "rgba(255,255,255,0.5)", fontSize: 12, cursor: "pointer", fontFamily: "'Outfit', sans-serif",
             }}>Cancelar</button>
             <button onClick={handleSave} disabled={saving} style={{
-              padding: "8px 16px", background: "linear-gradient(135deg, #E8B931, #d4a72a)",
-              border: "none", borderRadius: 8, color: "#1a1a1a", fontSize: 12,
-              fontWeight: 700, cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
+              padding: "8px 16px", background: "rgba(255,255,255,0.12)",
+              border: "none", borderRadius: 8, color: "#fff", fontSize: 12,
+              fontWeight: 700, cursor: "pointer", fontFamily: "'Outfit', sans-serif",
               opacity: saving ? 0.7 : 1,
             }}>{saving ? 'Guardando...' : 'Guardar'}</button>
           </div>
@@ -140,28 +140,28 @@ export default function MusiciansManager({ showNotif }) {
             <div key={m.id} style={{
               display: "flex", alignItems: "center", justifyContent: "space-between",
               padding: "12px 14px", marginBottom: 4, borderRadius: 10,
-              background: editingId === m.id ? "rgba(232,185,49,0.08)" : "rgba(255,255,255,0.02)",
+              background: editingId === m.id ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.02)",
               border: "1px solid rgba(255,255,255,0.05)",
             }}>
               <div>
-                <div style={{ color: "#e0e0e0", fontSize: 14, fontWeight: 500 }}>{m.nombre}</div>
+                <div style={{ color: "#E8E8E8", fontSize: 14, fontWeight: 500 }}>{m.nombre}</div>
                 <div style={{ display: "flex", gap: 4, marginTop: 4 }}>
                   {m.roles.map(r => (
                     <span key={r.id} style={{
-                      padding: "2px 8px", background: "rgba(232,185,49,0.1)",
-                      borderRadius: 10, fontSize: 10, color: "#E8B931",
+                      padding: "2px 8px", background: "rgba(255,255,255,0.08)",
+                      borderRadius: 10, fontSize: 10, color: "rgba(255,255,255,0.7)",
                     }}>{r.nombre}</span>
                   ))}
                 </div>
               </div>
               <div style={{ display: "flex", gap: 6 }}>
                 <button onClick={() => startEdit(m)} style={{
-                  padding: "4px 10px", background: "rgba(232,185,49,0.1)", border: "1px solid rgba(232,185,49,0.2)",
-                  borderRadius: 6, color: "#E8B931", fontSize: 11, cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
+                  padding: "4px 10px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)",
+                  borderRadius: 6, color: "#fff", fontSize: 11, cursor: "pointer", fontFamily: "'Outfit', sans-serif",
                 }}>Editar</button>
                 <button onClick={() => setDeleteTarget(m)} style={{
-                  padding: "4px 10px", background: "rgba(181,99,87,0.1)", border: "1px solid rgba(181,99,87,0.2)",
-                  borderRadius: 6, color: "#B56357", fontSize: 11, cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
+                  padding: "4px 10px", background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)",
+                  borderRadius: 6, color: "#EF4444", fontSize: 11, cursor: "pointer", fontFamily: "'Outfit', sans-serif",
                 }}>Eliminar</button>
               </div>
             </div>

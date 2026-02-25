@@ -36,47 +36,45 @@ export default function CultoDirector({ directorName, directorId, cultoId, onDir
   return (
     <div style={{
       display: "flex", alignItems: "center", gap: 10,
-      marginBottom: 20, animation: "fadeSlideIn 0.5s ease 0.15s both",
+      padding: "8px 24px 20px",
+      animation: "fadeUp 0.5s ease 0.35s both",
     }}>
       <div style={{
-        width: 28, height: 28, borderRadius: "50%",
-        background: "linear-gradient(135deg, #E8B931, #B56357)",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        color: "#fff", fontSize: 11, fontWeight: 700,
-      }}>{directorName?.[0] || 'D'}</div>
+        fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.25)",
+        textTransform: "uppercase", letterSpacing: 2, flexShrink: 0,
+      }}>Director:</div>
       <div style={{ flex: 1 }}>
-        <span style={{ color: "#666", fontSize: 10, textTransform: "uppercase", letterSpacing: 1 }}>
-          Director:
-        </span>
         {editing ? (
-          <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 4 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
             <select value={selectedId} onChange={e => setSelectedId(e.target.value)} style={{
-              padding: "4px 8px", background: "rgba(255,255,255,0.04)",
-              border: "1px solid rgba(255,255,255,0.1)", borderRadius: 6,
-              color: "#e0e0e0", fontSize: 12, outline: "none", fontFamily: "'DM Sans', sans-serif",
+              padding: "5px 10px", background: "rgba(255,255,255,0.06)",
+              border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8,
+              color: "#E8E8E8", fontSize: 12, outline: "none", fontFamily: "'Outfit', sans-serif",
             }}>
               <option value="">Sin director</option>
               {directors.map(d => <option key={d.id} value={d.id}>{d.nombre}</option>)}
             </select>
-            <button onClick={handleSave} disabled={saving} style={{
-              padding: "3px 10px", background: "rgba(232,185,49,0.15)",
-              border: "1px solid rgba(232,185,49,0.3)", borderRadius: 6,
-              color: "#E8B931", fontSize: 10, cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
+            <button onClick={handleSave} disabled={saving} className="action-btn" style={{
+              padding: "4px 12px", background: "rgba(255,255,255,0.08)",
+              border: "1px solid rgba(255,255,255,0.12)", borderRadius: 6,
+              color: "#fff", fontSize: 10, cursor: "pointer", fontFamily: "'Outfit', sans-serif",
+              fontWeight: 600,
             }}>{saving ? '...' : 'OK'}</button>
             <button onClick={() => { setEditing(false); setSelectedId(directorId || ''); }} style={{
-              padding: "3px 8px", background: "rgba(255,255,255,0.04)",
+              padding: "4px 10px", background: "rgba(255,255,255,0.04)",
               border: "1px solid rgba(255,255,255,0.08)", borderRadius: 6,
-              color: "#888", fontSize: 10, cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
+              color: "rgba(255,255,255,0.4)", fontSize: 10, cursor: "pointer", fontFamily: "'Outfit', sans-serif",
             }}>X</button>
           </div>
         ) : (
-          <span style={{ color: "#bbb", fontSize: 13, marginLeft: 6 }}>
+          <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 13 }}>
             {directorName || 'Sin asignar'}
             {isAdmin && (
-              <button onClick={() => setEditing(true)} style={{
-                marginLeft: 8, padding: "2px 8px", background: "rgba(232,185,49,0.08)",
-                border: "1px solid rgba(232,185,49,0.15)", borderRadius: 4,
-                color: "#E8B931", fontSize: 9, cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
+              <button onClick={() => setEditing(true)} className="action-btn" style={{
+                marginLeft: 8, padding: "2px 10px", background: "rgba(255,255,255,0.06)",
+                border: "1px solid rgba(255,255,255,0.08)", borderRadius: 6,
+                color: "rgba(255,255,255,0.4)", fontSize: 9, cursor: "pointer",
+                fontFamily: "'Outfit', sans-serif",
               }}>Cambiar</button>
             )}
           </span>

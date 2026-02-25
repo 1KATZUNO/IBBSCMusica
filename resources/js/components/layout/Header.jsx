@@ -6,29 +6,38 @@ export default function Header({ onOpenSidebar }) {
   return (
     <header style={{
       display: "flex", alignItems: "center", justifyContent: "space-between",
-      padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.04)",
-      background: "rgba(17,17,17,0.95)", backdropFilter: "blur(10px)",
+      padding: "16px 20px",
       position: "sticky", top: 0, zIndex: 50,
+      background: "rgba(10,10,11,0.85)",
+      backdropFilter: "blur(20px)",
+      borderBottom: "1px solid rgba(255,255,255,0.04)",
     }}>
       <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
         <button onClick={onOpenSidebar} style={{
-          background: "none", border: "none", color: "#e0e0e0", fontSize: 20, cursor: "pointer",
-          display: "flex", flexDirection: "column", gap: 4, padding: 4,
+          background: "rgba(255,255,255,0.06)", border: "none",
+          width: 36, height: 36, borderRadius: 10, cursor: "pointer",
+          display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 3.5,
         }}>
-          <div style={{ width: 20, height: 2, background: "#e0e0e0", borderRadius: 1 }} />
-          <div style={{ width: 15, height: 2, background: "#e0e0e0", borderRadius: 1 }} />
-          <div style={{ width: 20, height: 2, background: "#e0e0e0", borderRadius: 1 }} />
+          <div style={{ width: 16, height: 1.5, background: "#aaa", borderRadius: 2 }} />
+          <div style={{ width: 12, height: 1.5, background: "#aaa", borderRadius: 2 }} />
+          <div style={{ width: 16, height: 1.5, background: "#aaa", borderRadius: 2 }} />
         </button>
-        <span style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, fontWeight: 700, color: "#E8B931" }}>
-          ♪ Programa de Culto
-        </span>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <img src="/logo.svg" alt="IBBSC" style={{ width: 28, height: 28 }} />
+          <span style={{
+            fontFamily: "'Fraunces', serif", fontSize: 16, fontWeight: 600,
+            color: "#fff", letterSpacing: -0.3,
+          }}>
+            Programa de Culto
+          </span>
+        </div>
       </div>
       {isLoggedIn && (
         <div style={{
-          width: 30, height: 30, borderRadius: "50%",
-          background: "linear-gradient(135deg, #E8B931, #B56357)",
+          width: 32, height: 32, borderRadius: "50%",
+          background: "linear-gradient(135deg, #6C5CE7, #E17055)",
           display: "flex", alignItems: "center", justifyContent: "center",
-          color: "#fff", fontSize: 12, fontWeight: 700,
+          color: "#fff", fontSize: 11, fontWeight: 700,
         }}>{user?.name?.[0] || 'A'}</div>
       )}
     </header>

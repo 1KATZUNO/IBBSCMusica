@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\CantoController;
 use App\Http\Controllers\Api\CultoController;
 use App\Http\Controllers\Api\CultoMusicianController;
 use App\Http\Controllers\Api\DirectorController;
+use App\Http\Controllers\Api\EnsayoController;
 use App\Http\Controllers\Api\InvitationController;
 use App\Http\Controllers\Api\MusicianController;
 use App\Http\Controllers\Api\MusicianRoleController;
@@ -48,6 +49,10 @@ Route::middleware(['auth:sanctum', 'org'])->group(function () {
     Route::get('/settings/director-name', [SettingController::class, 'directorName']);
     Route::get('/servidores', [ServidorController::class, 'index']);
     Route::get('/servidor-roles', [ServidorRoleController::class, 'index']);
+
+    // Ensayos (read)
+    Route::get('/ensayos', [EnsayoController::class, 'index']);
+    Route::get('/ensayos/{id}', [EnsayoController::class, 'show']);
 
     // Ujieres (read - auto creates service if needed)
     Route::get('/cultos/{culto}/ujieres', [UjierServiceController::class, 'show']);
@@ -106,6 +111,15 @@ Route::middleware(['auth:sanctum', 'org'])->group(function () {
         Route::post('/cultos/{culto}/ujieres/reuniones', [UjierReunionController::class, 'store']);
         Route::put('/ujier-reuniones/{id}', [UjierReunionController::class, 'update']);
         Route::delete('/ujier-reuniones/{id}', [UjierReunionController::class, 'destroy']);
+
+        // Ensayos CRUD
+        Route::post('/ensayos', [EnsayoController::class, 'store']);
+        Route::put('/ensayos/{id}', [EnsayoController::class, 'update']);
+        Route::delete('/ensayos/{id}', [EnsayoController::class, 'destroy']);
+        Route::post('/ensayos/{id}/cantos', [EnsayoController::class, 'addCanto']);
+        Route::delete('/ensayos/{id}/cantos/{cantoId}', [EnsayoController::class, 'removeCanto']);
+        Route::post('/ensayos/{id}/asistentes', [EnsayoController::class, 'addAsistente']);
+        Route::delete('/ensayo-asistentes/{id}', [EnsayoController::class, 'removeAsistente']);
 
         // Servidores CRUD
         Route::post('/servidores', [ServidorController::class, 'store']);

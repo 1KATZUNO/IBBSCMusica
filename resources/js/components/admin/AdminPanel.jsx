@@ -5,6 +5,7 @@ import DirectorsManager from './DirectorsManager';
 import ServidoresManager from './ServidoresManager';
 import MembersManager from './MembersManager';
 import InvitationsManager from './InvitationsManager';
+import EnsayosManager from './EnsayosManager';
 
 export default function AdminPanel({ activePanel, showNotif }) {
   switch (activePanel) {
@@ -22,6 +23,8 @@ export default function AdminPanel({ activePanel, showNotif }) {
       return <MembersManager showNotif={showNotif} />;
     case 'invitations':
       return <InvitationsManager showNotif={showNotif} />;
+    case 'ensayos':
+      return <EnsayosManager showNotif={showNotif} />;
     default:
       return null;
   }

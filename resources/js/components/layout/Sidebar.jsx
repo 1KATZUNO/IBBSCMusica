@@ -135,6 +135,24 @@ export default function Sidebar({ isOpen, onClose, cultos, selectedCulto, onSele
             </button>
           )}
 
+          {/* Ensayos - visible for all */}
+          <div style={{
+            fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.25)",
+            textTransform: "uppercase", letterSpacing: 3, padding: "8px 12px", marginTop: 20, marginBottom: 4,
+          }}>Ensayos</div>
+          <button className="sidebar-item" onClick={() => { onAdminNav('ensayos'); onClose(); }} style={{
+            display: "flex", alignItems: "center", gap: 10,
+            width: "100%", textAlign: "left",
+            background: activeAdmin === 'ensayos' ? "rgba(255,255,255,0.06)" : "transparent",
+            border: "none",
+            borderRadius: 10, padding: "10px 12px", cursor: "pointer",
+            color: activeAdmin === 'ensayos' ? "#fff" : "rgba(255,255,255,0.45)",
+            fontSize: 13, fontFamily: "'Outfit', sans-serif",
+          }}>
+            <span style={{ fontSize: 14, width: 20, textAlign: "center" }}>&#x1F3B5;</span>
+            Ensayos
+          </button>
+
           {/* Admin section */}
           {isAdmin && (
             <>

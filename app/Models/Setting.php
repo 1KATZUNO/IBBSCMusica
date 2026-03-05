@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Traits\BelongsToOrganization;
 use Illuminate\Database\Eloquent\Model;
 
 class Setting extends Model
 {
-    protected $fillable = ['key', 'value'];
+    use BelongsToOrganization;
+
+    protected $fillable = ['organization_id', 'key', 'value'];
 
     public static function getValue(string $key, $default = null)
     {

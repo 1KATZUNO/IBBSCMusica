@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Traits\BelongsToOrganization;
 use Illuminate\Database\Eloquent\Model;
 
 class Musician extends Model
 {
-    protected $fillable = ['nombre', 'activo'];
+    use BelongsToOrganization;
+
+    protected $fillable = ['organization_id', 'nombre', 'activo'];
 
     protected function casts(): array
     {

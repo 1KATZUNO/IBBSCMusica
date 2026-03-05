@@ -79,9 +79,9 @@ export default function ProgramItem({
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{
             display: "inline-block",
-            padding: "2px 8px", borderRadius: 4,
-            background: `rgba(${ir},${ig},${ib},0.12)`,
-            color: itemColor, fontSize: 9, fontWeight: 700,
+            padding: "3px 10px", borderRadius: 6,
+            background: `rgba(${ir},${ig},${ib},0.15)`,
+            color: itemColor, fontSize: 11, fontWeight: 700,
             textTransform: "uppercase", letterSpacing: 0.5,
             flexShrink: 0,
           }}>
@@ -97,17 +97,17 @@ export default function ProgramItem({
           )}
         </div>
         <div style={{
-          fontSize: 14, fontWeight: isActive ? 600 : 500,
-          color: isActive ? itemColor : isCompleted ? "rgba(255,255,255,0.3)" : "#ddd",
-          marginTop: 3,
+          fontSize: 15, fontWeight: isActive ? 700 : 600,
+          color: isActive ? itemColor : isCompleted ? "rgba(255,255,255,0.3)" : "#fff",
+          marginTop: 4,
           textDecoration: isCompleted ? "line-through" : "none",
           whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
           transition: "color 0.3s ease",
         }}>
-          {item.canto ? item.canto.nombre : item.titulo}
+          {item.canto ? item.canto.nombre : item.titulo || item.tipo_label}
         </div>
-        {!item.canto && item.responsable && (
-          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.25)", marginTop: 1 }}>
+        {item.responsable && (
+          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginTop: 2, fontWeight: 500 }}>
             {item.responsable}
           </div>
         )}

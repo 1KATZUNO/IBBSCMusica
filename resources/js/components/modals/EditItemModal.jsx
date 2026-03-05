@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import CantoSearchInput from '../shared/CantoSearchInput';
+import api from '../../api/client';
 
 const inputStyle = {
   width: "100%", padding: "10px 12px", background: "rgba(255,255,255,0.06)",
@@ -15,8 +16,13 @@ export default function EditItemModal({ item, onClose, onSave, cantos, programIt
   const [titulo, setTitulo] = useState(item.titulo || '');
   const [duracion, setDuracion] = useState(item.duracion != null ? String(item.duracion) : '');
   const [saving, setSaving] = useState(false);
+  const [servidores, setServidores] = useState([]);
 
   const selectedType = programItemTypes.find(t => t.id === Number(typeId));
+
+  useEffect(() => {
+    api.get('/servidores').then(({ data }) => setServidores(data));
+  }, []);
 
   const handleSave = async () => {
     setSaving(true);
@@ -60,15 +66,26 @@ export default function EditItemModal({ item, onClose, onSave, cantos, programIt
         ) : (
           <>
             <label style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, textTransform: "uppercase", letterSpacing: 1.5 }}>Responsable</label>
-            <input value={responsable} onChange={e => setResponsable(e.target.value)}
-              placeholder="Ej: Hno. Carlos" style={{ ...inputStyle, marginTop: 4 }} />
-            {selectedType?.slug === 'leccion' && (
-              <>
-                <label style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, textTransform: "uppercase", letterSpacing: 1.5 }}>Titulo</label>
-                <input value={titulo} onChange={e => setTitulo(e.target.value)}
-                  placeholder="Ej: La fe que transforma" style={{ ...inputStyle, marginTop: 4 }} />
-              </>
+            {servidores.length > 0 ? (
+              <select value={responsable} onChange={e => setResponsable(e.target.value)}
+                style={{ ...inputStyle, marginTop: 4, background: "#1a1a1c", color: "#E8E8E8" }}>
+                <option value="" style={{ background: "#1a1a1c", color: "#999" }}>Seleccionar servidor...</option>
+                {servidores.filter(s => s.activo).map(s =>
+                  <option key={s.id} value={s.nombre} style={{ background: "#1a1a1c", color: "#E8E8E8" }}>
+                    {s.nombre}{s.roles?.length > 0 ? ` (${s.roles.map(r => r.nombre).join(', ')})` : ''}
+                  </option>
+                )}
+                {responsable && !servidores.find(s => s.nombre === responsable) && (
+                  <option value={responsable} style={{ background: "#1a1a1c", color: "#E8E8E8" }}>{responsable}</option>
+                )}
+              </select>
+            ) : (
+              <input value={responsable} onChange={e => setResponsable(e.target.value)}
+                placeholder="Ej: Hno. Carlos" style={{ ...inputStyle, marginTop: 4 }} />
             )}
+            <label style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, textTransform: "uppercase", letterSpacing: 1.5 }}>Titulo (opcional)</label>
+            <input value={titulo} onChange={e => setTitulo(e.target.value)}
+              placeholder="Ej: La fe que transforma" style={{ ...inputStyle, marginTop: 4 }} />
           </>
         )}
 

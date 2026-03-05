@@ -22,7 +22,9 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem('auth_token');
       localStorage.removeItem('auth_user');
+      window.location.href = '/';
     }
+    // Handle 403 needs_organization - let components handle this
     return Promise.reject(error);
   }
 );

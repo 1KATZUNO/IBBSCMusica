@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import CantoSearchInput from '../shared/CantoSearchInput';
+import api from '../../api/client';
 
 const inputStyle = {
   width: "100%", padding: "10px 12px", background: "rgba(255,255,255,0.06)",
@@ -15,6 +16,7 @@ export default function AddItemModal({ onClose, onAdd, cantos, programItemTypes 
   const [titulo, setTitulo] = useState('');
   const [duracion, setDuracion] = useState('');
   const [saving, setSaving] = useState(false);
+  const [servidores, setServidores] = useState([]);
 
   const selectedType = programItemTypes.find(t => t.id === Number(typeId));
 
@@ -23,6 +25,10 @@ export default function AddItemModal({ onClose, onAdd, cantos, programItemTypes 
       setTypeId(String(programItemTypes[0].id));
     }
   }, [programItemTypes]);
+
+  useEffect(() => {
+    api.get('/servidores').then(({ data }) => setServidores(data));
+  }, []);
 
   const handleAdd = async () => {
     setSaving(true);
@@ -66,8 +72,20 @@ export default function AddItemModal({ onClose, onAdd, cantos, programItemTypes 
         ) : (
           <>
             <label style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, textTransform: "uppercase", letterSpacing: 1.5 }}>Responsable</label>
-            <input value={responsable} onChange={e => setResponsable(e.target.value)}
-              placeholder="Ej: Hno. Carlos" style={{ ...inputStyle, marginTop: 4 }} />
+            {servidores.length > 0 ? (
+              <select value={responsable} onChange={e => setResponsable(e.target.value)}
+                style={{ ...inputStyle, marginTop: 4, background: "#1a1a1c", color: "#E8E8E8" }}>
+                <option value="" style={{ background: "#1a1a1c", color: "#999" }}>Seleccionar servidor...</option>
+                {servidores.filter(s => s.activo).map(s =>
+                  <option key={s.id} value={s.nombre} style={{ background: "#1a1a1c", color: "#E8E8E8" }}>
+                    {s.nombre}{s.roles?.length > 0 ? ` (${s.roles.map(r => r.nombre).join(', ')})` : ''}
+                  </option>
+                )}
+              </select>
+            ) : (
+              <input value={responsable} onChange={e => setResponsable(e.target.value)}
+                placeholder="Ej: Hno. Carlos" style={{ ...inputStyle, marginTop: 4 }} />
+            )}
             <label style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, textTransform: "uppercase", letterSpacing: 1.5 }}>Titulo (opcional)</label>
             <input value={titulo} onChange={e => setTitulo(e.target.value)}
               placeholder="Ej: La fe que transforma" style={{ ...inputStyle, marginTop: 4 }} />

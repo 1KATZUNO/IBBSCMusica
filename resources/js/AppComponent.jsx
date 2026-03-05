@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from './hooks/useAuth';
 import { useCultos } from './hooks/useCultos';
 import { useCantos } from './hooks/useCantos';
 import { useMusicians } from './hooks/useMusicians';
 import { useNotification } from './hooks/useNotification';
 import { useLiveMode } from './hooks/useLiveMode';
+import { useUjieres } from './hooks/useUjieres';
+import { useSwipe } from './hooks/useSwipe';
 import { formatTime } from './utils/formatTime';
 import api from './api/client';
 
@@ -17,6 +19,8 @@ import CultoMusicians from './components/culto/CultoMusicians';
 import CultoDirector from './components/culto/CultoDirector';
 import ProgramList from './components/culto/ProgramList';
 import AdminPanel from './components/admin/AdminPanel';
+import UjieresView from './components/ujieres/UjieresView';
+import ReunionesView from './components/ujieres/ReunionesView';
 
 import CreateCultoModal from './components/modals/CreateCultoModal';
 import AddItemModal from './components/modals/AddItemModal';
@@ -24,14 +28,66 @@ import EditItemModal from './components/modals/EditItemModal';
 import AssignMusicianModal from './components/modals/AssignMusicianModal';
 import ConfirmDeleteModal from './components/modals/ConfirmDeleteModal';
 
+import LoginPage from './components/auth/LoginPage';
+import RegisterPage from './components/auth/RegisterPage';
+import OrganizationSetupPage from './components/auth/OrganizationSetupPage';
+import AcceptInvitePage from './components/auth/AcceptInvitePage';
+
 function extractRgb(bg) {
   const m = bg?.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
   return m ? [+m[1], +m[2], +m[3]] : [100, 100, 100];
 }
 
 export default function App() {
-  const { isLoggedIn, isAdmin } = useAuth();
+  const { isLoggedIn, isAdmin, needsOrganization, user, loading: authLoading } = useAuth();
   const { notification, showNotif } = useNotification();
+
+  // Check for invite token in URL
+  const inviteMatch = window.location.pathname.match(/^\/invite\/(.+)/);
+  const inviteToken = inviteMatch?.[1];
+
+  // Auth page state (login vs register)
+  const [authPage, setAuthPage] = useState('login');
+
+  // Show loading while auth is initializing
+  if (authLoading) {
+    return (
+      <div style={{
+        minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: '#0A0A0B', color: '#555', fontFamily: "'Outfit', sans-serif",
+      }}>
+        <div style={{
+          width: 30, height: 30, border: '3px solid rgba(108,92,231,0.2)',
+          borderTopColor: '#6C5CE7', borderRadius: '50%',
+          animation: 'spin 0.8s linear infinite',
+        }} />
+      </div>
+    );
+  }
+
+  // Invite flow
+  if (inviteToken) {
+    return <AcceptInvitePage token={inviteToken} />;
+  }
+
+  // Not logged in → show auth pages
+  if (!isLoggedIn) {
+    return authPage === 'register'
+      ? <RegisterPage onSwitchToLogin={() => setAuthPage('login')} />
+      : <LoginPage onSwitchToRegister={() => setAuthPage('register')} />;
+  }
+
+  // Logged in but no org → setup page
+  if (needsOrganization) {
+    return <OrganizationSetupPage />;
+  }
+
+  // Full app
+  return <MainApp showNotif={showNotif} notification={notification} />;
+}
+
+function MainApp({ showNotif, notification }) {
+  const { isLoggedIn, isAdmin } = useAuth();
   const {
     cultos, cultoDetail, loading: cultoLoading,
     fetchCultos, fetchCultoDetail, setCultoDetail,
@@ -48,10 +104,38 @@ export default function App() {
     startCulto, stopCulto, completeItem, uncompleteItem, cancelAutoDelete,
   } = useLiveMode(cultoDetail, setCultoDetail, fetchCultoDetail);
 
+  const {
+    service: ujierService, loading: ujierLoading,
+    fetchService: fetchUjierService, updateService: updateUjierService,
+    addAssignment, updateAssignment, removeAssignment,
+    addReunion, updateReunion, removeReunion,
+  } = useUjieres();
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedCultoId, setSelectedCultoId] = useState(null);
   const [activeAdmin, setActiveAdmin] = useState(null);
+  const [activeTab, setActiveTab] = useState('programa');
   const [programItemTypes, setProgramItemTypes] = useState([]);
+
+  const tabs = ['programa', 'ujieres', 'reuniones'];
+  const handleSwipeLeft = useCallback(() => {
+    if (cultoDetail && !activeAdmin) {
+      setActiveTab(prev => {
+        const i = tabs.indexOf(prev);
+        return i < tabs.length - 1 ? tabs[i + 1] : prev;
+      });
+    }
+  }, [cultoDetail, activeAdmin]);
+  const handleSwipeRight = useCallback(() => {
+    if (cultoDetail && !activeAdmin) {
+      setActiveTab(prev => {
+        const i = tabs.indexOf(prev);
+        return i > 0 ? tabs[i - 1] : prev;
+      });
+    }
+  }, [cultoDetail, activeAdmin]);
+
+  const swipeHandlers = useSwipe({ onSwipeLeft: handleSwipeLeft, onSwipeRight: handleSwipeRight });
 
   // Modals
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -310,12 +394,57 @@ export default function App() {
 
       <Header onOpenSidebar={() => setSidebarOpen(true)} />
 
-      <main style={{ maxWidth: 680, margin: "0 auto", position: "relative" }}>
+      {cultoDetail && !activeAdmin && (
+        <div style={{ display: "flex", justifyContent: "center", padding: "8px 0 0" }}>
+          <div style={{
+            display: "flex", gap: 4, background: "rgba(255,255,255,0.04)",
+            borderRadius: 10, padding: 3,
+          }}>
+            {tabs.map(tab => (
+              <button key={tab} onClick={() => setActiveTab(tab)} style={{
+                padding: "6px 16px", borderRadius: 8, fontSize: 12, fontWeight: 600,
+                border: "none", cursor: "pointer", fontFamily: "'Outfit', sans-serif",
+                background: activeTab === tab ? "rgba(255,255,255,0.1)" : "transparent",
+                color: activeTab === tab ? "#fff" : "rgba(255,255,255,0.35)",
+                transition: "all 0.2s ease",
+              }}>
+                {tab === 'programa' ? 'Programa' : tab === 'ujieres' ? 'Ujieres' : 'Reuniones'}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <main style={{ maxWidth: 680, margin: "0 auto", position: "relative" }}
+        {...swipeHandlers}>
         <div style={{ padding: "0 0 120px" }}>
           {activeAdmin ? (
             <div style={{ padding: "24px 24px 0" }}>
               <AdminPanel activePanel={activeAdmin} showNotif={showNotif} />
             </div>
+          ) : activeTab === 'ujieres' && cultoDetail ? (
+            <UjieresView
+              cultoId={cultoDetail.id}
+              service={ujierService}
+              loading={ujierLoading}
+              fetchService={fetchUjierService}
+              updateService={updateUjierService}
+              addAssignment={addAssignment}
+              updateAssignment={updateAssignment}
+              removeAssignment={removeAssignment}
+              showNotif={showNotif}
+            />
+          ) : activeTab === 'reuniones' && cultoDetail ? (
+            <ReunionesView
+              cultoId={cultoDetail.id}
+              service={ujierService}
+              loading={ujierLoading}
+              fetchService={fetchUjierService}
+              addReunion={addReunion}
+              updateReunion={updateReunion}
+              removeReunion={removeReunion}
+              showNotif={showNotif}
+            />
           ) : cultoDetail ? (
             <>
               <CultoHeader
@@ -378,7 +507,9 @@ export default function App() {
             </div>
           ) : (
             <div style={{ textAlign: "center", padding: "60px 20px", color: "#555" }}>
-              Selecciona un culto del panel lateral
+              {cultos.length === 0
+                ? 'Crea tu primer culto desde el panel lateral'
+                : 'Selecciona un culto del panel lateral'}
             </div>
           )}
         </div>
@@ -393,8 +524,6 @@ export default function App() {
           onComplete={() => handleCompleteItem(activeProgItem.id)}
         />
       )}
-
-      {!isLoggedIn && <FooterHint />}
     </div>
   );
 }

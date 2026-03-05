@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { formatDate } from '../../utils/formatDate';
 
@@ -8,27 +7,9 @@ function hexToRgb(hex) {
 }
 
 export default function Sidebar({ isOpen, onClose, cultos, selectedCulto, onSelectCulto, onCreateCulto, onDeleteCulto, onAdminNav, activeAdmin, showNotif, cultoDetail }) {
-  const { isLoggedIn, isAdmin, login, logout, user } = useAuth();
-  const [email, setEmail] = useState('');
-  const [pass, setPass] = useState('');
-  const [loginLoading, setLoginLoading] = useState(false);
+  const { isLoggedIn, isAdmin, logout, user } = useAuth();
 
   const cultoColor = cultoDetail?.color || '#6C5CE7';
-
-  const handleLogin = async () => {
-    if (!email || !pass) return;
-    setLoginLoading(true);
-    try {
-      await login(email, pass);
-      setEmail('');
-      setPass('');
-      showNotif('Sesion iniciada como Director');
-    } catch (e) {
-      showNotif(e.response?.data?.message || 'Error al iniciar sesion', 'error');
-    } finally {
-      setLoginLoading(false);
-    }
-  };
 
   const handleLogout = async () => {
     await logout();
@@ -41,6 +22,9 @@ export default function Sidebar({ isOpen, onClose, cultos, selectedCulto, onSele
     { key: 'musicians', icon: '\uD83C\uDFB8', label: 'Musicos' },
     { key: 'types', icon: '\u25C9', label: 'Tipos' },
     { key: 'directors', icon: '\u25C8', label: 'Directores' },
+    { key: 'servidores', icon: '\uD83D\uDE4F', label: 'Servidores' },
+    { key: 'members', icon: '\uD83D\uDC65', label: 'Miembros' },
+    { key: 'invitations', icon: '\u2709', label: 'Invitaciones' },
   ];
 
   return (
@@ -67,7 +51,9 @@ export default function Sidebar({ isOpen, onClose, cultos, selectedCulto, onSele
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <img src="/logo.svg" alt="IBBSC" style={{ width: 32, height: 32 }} />
               <div>
-                <div style={{ fontFamily: "'Fraunces', serif", fontSize: 17, fontWeight: 600, color: "#fff" }}>IBBSC</div>
+                <div style={{ fontFamily: "'Fraunces', serif", fontSize: 17, fontWeight: 600, color: "#fff" }}>
+                  {user?.organization?.name || 'IBBSC'}
+                </div>
                 <div style={{ fontSize: 10, color: "rgba(255,255,255,0.35)", letterSpacing: 2, textTransform: "uppercase" }}>Ministerio Musica</div>
               </div>
             </div>
@@ -174,20 +160,24 @@ export default function Sidebar({ isOpen, onClose, cultos, selectedCulto, onSele
           )}
         </div>
 
-        {/* Login / User section */}
+        {/* User section */}
         <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "16px 20px" }}>
-          {isLoggedIn ? (
+          {isLoggedIn && (
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
                 <div style={{
                   width: 32, height: 32, borderRadius: "50%",
-                  background: `linear-gradient(135deg, ${cultoColor}, #E17055)`,
+                  background: user?.avatar ? 'none' : `linear-gradient(135deg, ${cultoColor}, #E17055)`,
+                  backgroundImage: user?.avatar ? `url(${user.avatar})` : 'none',
+                  backgroundSize: 'cover',
                   display: "flex", alignItems: "center", justifyContent: "center",
                   color: "#fff", fontSize: 12, fontWeight: 700,
-                }}>{user?.name?.[0] || 'D'}</div>
+                }}>{!user?.avatar && (user?.name?.[0] || 'U')}</div>
                 <div>
-                  <div style={{ color: "#ddd", fontSize: 12, fontWeight: 600 }}>Director de Musica</div>
-                  <div style={{ color: "rgba(255,255,255,0.25)", fontSize: 10 }}>Modo edicion</div>
+                  <div style={{ color: "#ddd", fontSize: 12, fontWeight: 600 }}>{user?.name}</div>
+                  <div style={{ color: "rgba(255,255,255,0.25)", fontSize: 10 }}>
+                    {user?.role === 'admin' ? 'Administrador' : 'Miembro'}
+                  </div>
                 </div>
               </div>
               <button onClick={handleLogout} style={{
@@ -196,40 +186,6 @@ export default function Sidebar({ isOpen, onClose, cultos, selectedCulto, onSele
                 color: "#888", fontSize: 12, cursor: "pointer", fontFamily: "'Outfit', sans-serif",
               }}>
                 Cerrar sesion
-              </button>
-            </div>
-          ) : (
-            <div>
-              <div style={{
-                fontSize: 9, fontWeight: 700, color: "rgba(255,255,255,0.25)",
-                textTransform: "uppercase", letterSpacing: 2, marginBottom: 10,
-              }}>
-                Acceso Director
-              </div>
-              <input value={email} onChange={e => setEmail(e.target.value)}
-                placeholder="Email" type="email" style={{
-                  width: "100%", padding: "9px 12px", marginBottom: 6,
-                  background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
-                  borderRadius: 8, color: "#E8E8E8", fontSize: 13, outline: "none",
-                  fontFamily: "'Outfit', sans-serif", boxSizing: "border-box",
-                }} />
-              <input value={pass} onChange={e => setPass(e.target.value)}
-                type="password" placeholder="Contrasena"
-                onKeyDown={e => e.key === 'Enter' && handleLogin()}
-                style={{
-                  width: "100%", padding: "9px 12px", marginBottom: 10,
-                  background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
-                  borderRadius: 8, color: "#E8E8E8", fontSize: 13, outline: "none",
-                  fontFamily: "'Outfit', sans-serif", boxSizing: "border-box",
-                }} />
-              <button onClick={handleLogin} disabled={loginLoading} style={{
-                width: "100%", padding: "10px",
-                background: `linear-gradient(135deg, ${cultoColor}, ${cultoColor}CC)`,
-                border: "none", borderRadius: 8, color: "#fff", fontSize: 13,
-                fontWeight: 700, cursor: "pointer", fontFamily: "'Outfit', sans-serif",
-                opacity: loginLoading ? 0.7 : 1,
-              }}>
-                {loginLoading ? 'Iniciando...' : 'Iniciar Sesion'}
               </button>
             </div>
           )}

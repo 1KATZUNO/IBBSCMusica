@@ -28,17 +28,19 @@ export default function Header({ onOpenSidebar }) {
             fontFamily: "'Fraunces', serif", fontSize: 16, fontWeight: 600,
             color: "#fff", letterSpacing: -0.3,
           }}>
-            Programa de Culto
+            {user?.organization?.name || 'Programa de Culto'}
           </span>
         </div>
       </div>
       {isLoggedIn && (
         <div style={{
           width: 32, height: 32, borderRadius: "50%",
-          background: "linear-gradient(135deg, #6C5CE7, #E17055)",
+          background: user?.avatar ? 'none' : "linear-gradient(135deg, #6C5CE7, #E17055)",
+          backgroundImage: user?.avatar ? `url(${user.avatar})` : 'none',
+          backgroundSize: 'cover',
           display: "flex", alignItems: "center", justifyContent: "center",
           color: "#fff", fontSize: 11, fontWeight: 700,
-        }}>{user?.name?.[0] || 'A'}</div>
+        }}>{!user?.avatar && (user?.name?.[0] || 'A')}</div>
       )}
     </header>
   );

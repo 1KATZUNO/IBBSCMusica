@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
+use App\Models\Traits\BelongsToOrganization;
 use Illuminate\Database\Eloquent\Model;
 
 class Canto extends Model
 {
-    protected $fillable = ['nombre', 'youtube_url'];
+    use BelongsToOrganization;
+
+    protected $fillable = ['organization_id', 'nombre', 'youtube_url'];
 }

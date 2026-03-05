@@ -68,3 +68,13 @@ select option { background: #111113; color: #E8E8E8; }
 .action-btn:hover { transform: scale(1.05); filter: brightness(1.2); }
 
 .eq-bar { animation: eqBar 0.8s ease-in-out infinite; }
+
+@media print {
+  body * { visibility: hidden; }
+  .printable-area, .printable-area * { visibility: visible; }
+  .printable-area { position: absolute; left: 0; top: 0; width: 100%; }
+  .printable-area .print-header { display: block !important; }
+  .printable-area table { color: #000; }
+  .printable-area th { color: #333; border-bottom: 1px solid #ccc; }
+  .printable-area td { color: #000; border-bottom: 1px solid #eee; }
+}

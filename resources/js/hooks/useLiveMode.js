@@ -70,20 +70,18 @@ export function useLiveMode(cultoDetail, setCultoDetail, fetchCultoDetail) {
     if (item.completed_at) return 0;
     if (item.id !== activeItemId) return 0;
 
-    // Sum durations of all completed items before this one (in seconds)
     const programa = cultoDetail.programa || [];
-    let completedDurationSecs = 0;
+
+    // Find the last completed item before this one — use its completed_at as our start time
+    let itemStartTime = new Date(cultoDetail.started_at).getTime();
     for (const p of programa) {
       if (p.id === item.id) break;
       if (p.completed_at) {
-        completedDurationSecs += (p.duracion || 0) * 60;
+        itemStartTime = new Date(p.completed_at).getTime();
       }
     }
 
-    // Time since culto started minus the duration budget of completed items
-    const startTime = new Date(cultoDetail.started_at).getTime();
-    const totalElapsed = Math.floor((Date.now() - startTime) / 1000);
-    return Math.max(0, totalElapsed - completedDurationSecs);
+    return Math.max(0, Math.floor((Date.now() - itemStartTime) / 1000));
   }, [isLive, cultoDetail, activeItemId]);
 
   const startCulto = useCallback(async (cultoId) => {

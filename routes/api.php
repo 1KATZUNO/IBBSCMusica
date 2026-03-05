@@ -5,29 +5,52 @@ use App\Http\Controllers\Api\CantoController;
 use App\Http\Controllers\Api\CultoController;
 use App\Http\Controllers\Api\CultoMusicianController;
 use App\Http\Controllers\Api\DirectorController;
+use App\Http\Controllers\Api\InvitationController;
 use App\Http\Controllers\Api\MusicianController;
 use App\Http\Controllers\Api\MusicianRoleController;
+use App\Http\Controllers\Api\OrganizationController;
 use App\Http\Controllers\Api\ProgramItemController;
 use App\Http\Controllers\Api\ProgramItemTypeController;
+use App\Http\Controllers\Api\ServidorController;
+use App\Http\Controllers\Api\ServidorRoleController;
 use App\Http\Controllers\Api\SettingController;
+use App\Http\Controllers\Api\SocialAuthController;
+use App\Http\Controllers\Api\UjierAssignmentController;
+use App\Http\Controllers\Api\UjierReunionController;
+use App\Http\Controllers\Api\UjierServiceController;
 use Illuminate\Support\Facades\Route;
 
-// Public endpoints
-Route::get('/cultos', [CultoController::class, 'index']);
-Route::get('/cultos/{id}', [CultoController::class, 'show']);
-Route::get('/cantos', [CantoController::class, 'index']);
-Route::get('/program-item-types', [ProgramItemTypeController::class, 'index']);
-Route::get('/musician-roles', [MusicianRoleController::class, 'index']);
-Route::get('/directors', [DirectorController::class, 'index']);
-Route::get('/musicians', [MusicianController::class, 'index']);
-Route::get('/settings/director-name', [SettingController::class, 'directorName']);
-
-// Auth
+// Public auth
 Route::post('/auth/login', [AuthController::class, 'login']);
+Route::post('/auth/register', [AuthController::class, 'register']);
+Route::get('/auth/google/redirect', [SocialAuthController::class, 'redirect']);
 
+// Invitation (public - accept by token)
+Route::get('/invitations/{token}', [InvitationController::class, 'show']);
+Route::post('/invitations/{token}/accept', [InvitationController::class, 'accept']);
+
+// Auth without org requirement
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('/auth/user', [AuthController::class, 'user']);
+    Route::post('/auth/setup-organization', [AuthController::class, 'setupOrganization']);
+});
+
+// Auth + org required (read access)
+Route::middleware(['auth:sanctum', 'org'])->group(function () {
+    Route::get('/cultos', [CultoController::class, 'index']);
+    Route::get('/cultos/{id}', [CultoController::class, 'show']);
+    Route::get('/cantos', [CantoController::class, 'index']);
+    Route::get('/program-item-types', [ProgramItemTypeController::class, 'index']);
+    Route::get('/musician-roles', [MusicianRoleController::class, 'index']);
+    Route::get('/directors', [DirectorController::class, 'index']);
+    Route::get('/musicians', [MusicianController::class, 'index']);
+    Route::get('/settings/director-name', [SettingController::class, 'directorName']);
+    Route::get('/servidores', [ServidorController::class, 'index']);
+    Route::get('/servidor-roles', [ServidorRoleController::class, 'index']);
+
+    // Ujieres (read - auto creates service if needed)
+    Route::get('/cultos/{culto}/ujieres', [UjierServiceController::class, 'show']);
 
     // Admin routes
     Route::middleware('admin')->group(function () {
@@ -74,5 +97,29 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Settings
         Route::put('/settings/director-name', [SettingController::class, 'updateDirectorName']);
+
+        // Ujieres (admin)
+        Route::put('/cultos/{culto}/ujieres', [UjierServiceController::class, 'update']);
+        Route::post('/cultos/{culto}/ujieres/assignments', [UjierAssignmentController::class, 'store']);
+        Route::put('/ujier-assignments/{id}', [UjierAssignmentController::class, 'update']);
+        Route::delete('/ujier-assignments/{id}', [UjierAssignmentController::class, 'destroy']);
+        Route::post('/cultos/{culto}/ujieres/reuniones', [UjierReunionController::class, 'store']);
+        Route::put('/ujier-reuniones/{id}', [UjierReunionController::class, 'update']);
+        Route::delete('/ujier-reuniones/{id}', [UjierReunionController::class, 'destroy']);
+
+        // Servidores CRUD
+        Route::post('/servidores', [ServidorController::class, 'store']);
+        Route::put('/servidores/{id}', [ServidorController::class, 'update']);
+        Route::delete('/servidores/{id}', [ServidorController::class, 'destroy']);
+
+        // Invitations management
+        Route::get('/invitations', [InvitationController::class, 'index']);
+        Route::post('/invitations', [InvitationController::class, 'store']);
+        Route::delete('/invitations/{id}', [InvitationController::class, 'destroy']);
+
+        // Organization members management
+        Route::get('/organization/members', [OrganizationController::class, 'members']);
+        Route::put('/organization/members/{userId}/role', [OrganizationController::class, 'updateRole']);
+        Route::delete('/organization/members/{userId}', [OrganizationController::class, 'removeMember']);
     });
 });

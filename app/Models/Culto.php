@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Traits\BelongsToOrganization;
 use Illuminate\Database\Eloquent\Model;
 
 class Culto extends Model
 {
-    protected $fillable = ['tipo', 'fecha', 'hora', 'color', 'director_id', 'started_at', 'completed_all_at'];
+    use BelongsToOrganization;
+
+    protected $fillable = ['organization_id', 'tipo', 'fecha', 'hora', 'color', 'director_id', 'started_at', 'completed_all_at'];
 
     protected function casts(): array
     {

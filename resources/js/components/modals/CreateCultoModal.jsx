@@ -11,7 +11,7 @@ const inputStyle = {
 export default function CreateCultoModal({ onClose, onCreate }) {
   const [tipo, setTipo] = useState("Domingo AM");
   const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0]);
-  const [hora, setHora] = useState("9:00 AM");
+  const [hora, setHora] = useState("09:00");
   const [directorId, setDirectorId] = useState('');
   const [directors, setDirectors] = useState([]);
   const [saving, setSaving] = useState(false);
@@ -52,7 +52,7 @@ export default function CreateCultoModal({ onClose, onCreate }) {
         <label style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, textTransform: "uppercase", letterSpacing: 1.5 }}>Fecha</label>
         <input type="date" value={fecha} onChange={e => setFecha(e.target.value)} style={{ ...inputStyle, marginTop: 4 }} />
         <label style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, textTransform: "uppercase", letterSpacing: 1.5 }}>Hora</label>
-        <input value={hora} onChange={e => setHora(e.target.value)} style={{ ...inputStyle, marginTop: 4 }} />
+        <input type="time" value={hora} onChange={e => setHora(e.target.value)} style={{ ...inputStyle, marginTop: 4 }} />
         <label style={{ color: "rgba(255,255,255,0.35)", fontSize: 11, textTransform: "uppercase", letterSpacing: 1.5 }}>Director</label>
         <select value={directorId} onChange={e => setDirectorId(e.target.value)} style={{ ...inputStyle, marginTop: 4 }}>
           <option value="">Sin director</option>

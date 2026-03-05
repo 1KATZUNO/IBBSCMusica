@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\Route;
 Route::post('/auth/login', [AuthController::class, 'login']);
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::get('/auth/google/redirect', [SocialAuthController::class, 'redirect']);
+Route::post('/auth/google-mobile', [SocialAuthController::class, 'mobileCallback']);
 
 // Invitation (public - accept by token)
 Route::get('/invitations/{token}', [InvitationController::class, 'show']);
@@ -35,6 +36,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('/auth/user', [AuthController::class, 'user']);
     Route::post('/auth/setup-organization', [AuthController::class, 'setupOrganization']);
+    Route::post('/auth/leave-organization', [AuthController::class, 'leaveOrganization']);
 });
 
 // Auth + org required (read access)
@@ -56,6 +58,9 @@ Route::middleware(['auth:sanctum', 'org'])->group(function () {
 
     // Ujieres (read - auto creates service if needed)
     Route::get('/cultos/{culto}/ujieres', [UjierServiceController::class, 'show']);
+
+    // Reuniones (all across cultos)
+    Route::get('/reuniones', [UjierReunionController::class, 'index']);
 
     // Admin routes
     Route::middleware('admin')->group(function () {

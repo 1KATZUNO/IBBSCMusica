@@ -128,6 +128,25 @@ class AuthController extends Controller
         ]);
     }
 
+    public function leaveOrganization(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user->organization_id) {
+            return response()->json(['message' => 'No perteneces a ninguna organización.'], 422);
+        }
+
+        $user->update([
+            'organization_id' => null,
+            'role' => 'admin', // reset to admin so they can create their own org
+        ]);
+
+        return response()->json([
+            'user' => $this->userPayload($user->fresh()),
+            'message' => 'Has salido de la organización.',
+        ]);
+    }
+
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();

@@ -7,7 +7,7 @@ function hexToRgb(hex) {
 }
 
 export default function Sidebar({ isOpen, onClose, cultos, selectedCulto, onSelectCulto, onCreateCulto, onDeleteCulto, onAdminNav, activeAdmin, showNotif, cultoDetail }) {
-  const { isLoggedIn, isAdmin, logout, user } = useAuth();
+  const { isLoggedIn, isAdmin, logout, leaveOrganization, user } = useAuth();
 
   const cultoColor = cultoDetail?.color || '#6C5CE7';
 
@@ -198,13 +198,30 @@ export default function Sidebar({ isOpen, onClose, cultos, selectedCulto, onSele
                   </div>
                 </div>
               </div>
-              <button onClick={handleLogout} style={{
-                width: "100%", padding: "8px", background: "rgba(255,255,255,0.04)",
-                border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8,
-                color: "#888", fontSize: 12, cursor: "pointer", fontFamily: "'Outfit', sans-serif",
-              }}>
-                Cerrar sesion
-              </button>
+              <div style={{ display: "flex", gap: 8 }}>
+                <button onClick={handleLogout} style={{
+                  flex: 1, padding: "8px", background: "rgba(255,255,255,0.04)",
+                  border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8,
+                  color: "#888", fontSize: 12, cursor: "pointer", fontFamily: "'Outfit', sans-serif",
+                }}>
+                  Cerrar sesion
+                </button>
+                {user?.organization_id && (
+                  <button onClick={async () => {
+                    if (confirm('¿Seguro que quieres salir de esta organización? Podrás crear tu propia iglesia después.')) {
+                      await leaveOrganization();
+                      showNotif('Has salido de la organización');
+                    }
+                  }} style={{
+                    padding: "8px 10px", background: "rgba(225,112,85,0.08)",
+                    border: "1px solid rgba(225,112,85,0.15)", borderRadius: 8,
+                    color: "#E17055", fontSize: 11, cursor: "pointer", fontFamily: "'Outfit', sans-serif",
+                    whiteSpace: "nowrap",
+                  }}>
+                    Salir de org
+                  </button>
+                )}
+              </div>
             </div>
           )}
         </div>

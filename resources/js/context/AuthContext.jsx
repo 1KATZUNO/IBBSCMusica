@@ -64,6 +64,13 @@ export function AuthProvider({ children }) {
     return data;
   };
 
+  const leaveOrganization = async () => {
+    const { data } = await api.post('/auth/leave-organization');
+    localStorage.setItem('auth_user', JSON.stringify(data.user));
+    setUser(data.user);
+    return data;
+  };
+
   const logout = async () => {
     try {
       await api.post('/auth/logout');
@@ -82,7 +89,7 @@ export function AuthProvider({ children }) {
   return (
     <AuthContext.Provider value={{
       user, setUser, isLoggedIn, isAdmin, needsOrganization,
-      login, register, setupOrganization, logout, loading,
+      login, register, setupOrganization, leaveOrganization, logout, loading,
     }}>
       {children}
     </AuthContext.Provider>
